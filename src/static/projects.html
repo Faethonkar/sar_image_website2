@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR Imaging Team - Projects</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1 style="font-size: 2.5em;">DBF_Solutions</h1>
+        <p style="font-size: 1.25em;">AI-Powered ATR with Synthetic Aperture Radar (SAR) Technology</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/technology">Technology</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div class="placeholder">
+            <section>
+            <h2 style="font-size: 2em; margin-bottom: 20px; color: #005580;">Project Showcase: AI Algorithms for Vessel and Aircraft Detection</h2>
+            
+            <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.5em; color: #005580;">Objective</h3>
+            <p style="font-size: 1.2em;">
+            The goal of this project is to develop advanced AI algorithms for the accurate detection and classification of vessels and aircraft from Synthetic Aperture Radar (SAR) imagery. These algorithms aim to improve maritime surveillance, enhance situational awareness, and provide reliable data for defense and commercial applications.
+            </p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
+                <div id="image-carousel-1" style="position: relative; width: 100%; height: 300px; overflow: hidden;">
+                    <img src="/static/images/sar_image1.PNG" alt="Image 1"
+                         style="width: 40%; height: 100%; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 1;">
+                    <img src="/static/images/sar_image5.PNG" alt="Image 2"
+                         style="width: 40%; height: 100%; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
+                </div>
+                <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">
+                    Figure: Rotating carousel showcasing SAR imagery used for aircraft detection.
+                </p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.5em; color: #005580;">Methodology</h3>
+            <p style="font-size: 1.2em;">
+            The project follows a multi-step approach involving:
+            <ul style="font-size: 1.2em;">
+                <li>Data Collection: Gathering SAR imagery from various sources, including satellite and airborne sensors.</li>
+                <li>Data Preprocessing: Enhancing SAR images by removing noise and improving resolution for better analysis.</li>
+                <li>AI Model Development: Using deep learning techniques, such as <strong>Convolutional Neural Networks (CNNs)</strong>, to train models on annotated data for vessel and aircraft detection.</li>
+                <li>Testing & Optimization: Validating model performance and optimizing for real-time detection across various conditions.</li>
+            </ul>
+            </p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.5em; color: #005580;">Results</h3>
+            <p style="font-size: 1.2em;">
+            The developed AI models demonstrated high accuracy in detecting vessels and aircraft from SAR imagery. Key results include:
+            <ul style="font-size: 1.2em;">
+                <li>Detection of distinct vessel types in <strong>maritime environments</strong>.</li>
+                <li>Successful detection of aircraft, even in challenging weather conditions or low visibility.</li>
+                <li> Near Real-time processing capabilities, <strong>low detection time</strong>.</li>
+            </ul>
+            </p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.5em; color: #005580;">Case Study</h3>
+            <p style="font-size: 1.2em;">
+            In a recent case study focused on maritime surveillance, the AI model demonstrated exceptional performance by detecting vessels in restricted waters. 
+            It achieved a detection accuracy exceeding 90%, greatly improving situational awareness and operational efficiency for naval missions. 
+            </p>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
+                <div id="image-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden;">
+                    <img src="/static/images/sar_image2.jpg" alt="Image 1"
+                         style="width: 40%; height: 100%; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 1;">
+                    <img src="/static/images/sar_image3.jpg" alt="Image 2"
+                         style="width: 40%; height: 100%; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
+                         <img src="/static/images/sar_image4.jpg" alt="Image 2"
+                         style="width: 40%; height: 100%; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
+                </div>
+                <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Figure: Example of SAR imagery with detected vessels marked for analysis.</p>
+            </div>           
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 DBF_Solutions. All rights reserved.</p>
+    </footer>
+    <script>
+        function initCarousel(carouselId) {
+            const images = document.querySelectorAll(`#${carouselId} img`);
+            let currentIndex = 0;
+    
+            setInterval(() => {
+                images[currentIndex].style.opacity = 0;
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].style.opacity = 1;
+            }, 5000);
+        }
+    
+        // Initialize both carousels
+        initCarousel('image-carousel-1');
+        initCarousel('image-carousel');
+    </script>
+</body>
+</html>

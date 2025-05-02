@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR Imaging Team - Contact</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1 style="font-size: 2.5em;">DBF_Solutions</h1>
+        <p style="font-size: 1.25em;">AI-Powered ATR with Synthetic Aperture Radar (SAR) Technology</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/technology">Technology</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Contact Us</h2>
+        <div class="placeholder">
+            <p><strong>Contact Form:</strong> Please enter your data and we will contact you</p>
+            <form action="/submit_contact" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required placeholder="[Enter your name]">
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="[Enter your email]">
+
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="5" required placeholder="[Enter your message]"></textarea>
+
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 DBF_Solutions. All rights reserved.</p>
+    </footer>
+</body>
+</html>
