@@ -53,10 +53,6 @@ def handle_contact_form():
         print(f"Database error: {e}")
         return jsonify({'message': 'Failed to save submission to database.'}), 500
 
-# Health check route (optional)
-@app.route('/')
-def index():
-    return "Server is running!"
 
 # Run the app
 if __name__ == '__main__':
