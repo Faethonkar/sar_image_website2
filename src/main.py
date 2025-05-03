@@ -1,13 +1,14 @@
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
+
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory, request, jsonify, make_response
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-# Import the db instance and the model
 from src.models.contact_submission import db, ContactSubmission
 
 # Initialize Flask app
@@ -16,9 +17,17 @@ app = Flask(__name__,
             instance_relative_config=True,
             instance_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance'))
 
-# Configuration for PostgreSQL on Render
+# Configuration for SQLite (local database)
+basedir = os.path.abspath(os.path.dirname(__file__))
+instance_path = os.path.join(basedir, 'instance')
+
+# Ensure the instance directory exists
+Path(instance_path).mkdir(parents=True, exist_ok=True)
+
+# Database configuration - using contact_submissions.db
+db_path = os.path.join(instance_path, 'contact_submissions.db')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_secure_temporary_secret_key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL').replace('postgres://', 'postgresql://')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database with the app
@@ -27,7 +36,7 @@ db.init_app(app)
 # Basic Authentication Setup
 auth = HTTPBasicAuth()
 users = {
-    "admin": generate_password_hash(os.getenv('ADMIN_PASSWORD', 'defaultpassword'))
+    "admin": generate_password_hash(os.getenv('ADMIN_PASSWORD', 'defaultpassword'), method='pbkdf2:sha256')
 }
 
 @auth.verify_password
@@ -37,7 +46,12 @@ def verify_password(username, password):
 
 # Create database tables if they don't exist
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print(f"Database created successfully at: {db_path}")
+    except Exception as e:
+        print(f"Error creating database: {str(e)}")
+        raise
 
 # Route to serve static files
 @app.route('/', defaults={'path': ''})
@@ -117,4 +131,7 @@ def export_submissions():
     return response
 
 if __name__ == '__main__':
+    # Create the instance directory if it doesn't exist
+    if not os.path.exists(os.path.join(basedir, 'instance')):
+        os.makedirs(os.path.join(basedir, 'instance'))
     app.run(host='0.0.0.0', port=5000, debug=False)
