@@ -5,3 +5,5 @@ SQLAlchemy==2.0.40
 cryptography==36.0.2
 gunicorn
 psycopg2-binary
+flask-httpauth==4.8.0
+Werkzeug==3.0.1
