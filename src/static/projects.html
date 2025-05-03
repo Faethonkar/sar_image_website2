@@ -82,6 +82,106 @@
 </head>
 <body>
 <header>
+<h1>DBF_Solutions</h1>
+<p>AI-Powered ATR with Synthetic Aperture Radar (SAR) Technology</p>
+</header>
+
+<nav>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/about">About Us</a></li>
+<li><a href="/technology">Technology</a></li>
+<li><a href="/projects">Projects</a></li>
+<li><a href="/contact">Contact</a></li>
+</ul>
+</nav>
+
+<main>
+<div class="placeholder">
+<section>
+<h2>Project Showcase: AI Algorithms for Vessel and Aircraft Detection</h2>
+
+<div>
+<h3>Objective</h3>
+<p>
+The goal of this project is to develop advanced AI algorithms for the accurate detection and classification of vessels and aircraft from Synthetic Aperture Radar (SAR) imagery...
+</p>
+</div>
+
+<!-- VISUALS SECTION CENTERED -->
+<div style="text-align: center;">
+<h3>Visuals</h3>
+<div style="display: flex; justify-content: center;">
+<div style="width: 300px;">
+<img src="/static/images/sar_image1.PNG" alt="SAR Image 2" style="width: 100%; border-radius: 8px;">
+<p style="margin-top: 10px;">Aircraft Detection Example</p>
+</div>
+
+
+<!-- OTHER SECTIONS LEFT-ALIGNED -->
+<div>
+<h3>Methodology</h3>
+<ul>
+<li>Data Collection: Gathering SAR imagery</li>
+<li>Data Preprocessing: Enhancing SAR images</li>
+<li>AI Model Development: Using deep learning techniques</li>
+<li>Testing & Optimization: Validating model performance</li>
+</ul>
+</div>
+
+<div>
+<h3>Results</h3>
+<ul>
+<li>Detection of distinct vessel types in maritime environments.</li>
+<li>Successful detection of aircraft under low visibility.</li>
+<li>Near real-time processing with low detection time.</li>
+</ul>
+</div>
+
+<div>
+<h3>Case Study</h3>
+<p>
+In a recent case study focused on maritime surveillance, the AI model achieved over 90% detection accuracy...
+</p>
+</div>
+
+<div style="text-align: center;">
+<h3>Visuals</h3>
+<div id="image-carousel" class="carousel-container" style="margin: 0 auto;">
+<img src="/static/images/sar_image2.jpg" alt="Image 1" class="active" />
+<img src="/static/images/sar_image3.jpg" alt="Image 2" />
+<img src="/static/images/sar_image4.jpg" alt="Image 3" />
+</div>
+<p style="margin-top: 10px;">Example of SAR imagery with detected vessels marked.</p>
+</div>
+</section>
+</div>
+</main>
+
+<footer>
+<p>&copy; 2025 DBF_Solutions. All rights reserved.</p>
+</footer>
+
+<script>
+function initCarousel(carouselId) {
+const images = document.querySelectorAll(`#${carouselId} img`);
+let currentIndex = 0;
+
+setInterval(() => {
+images[currentIndex].classList.remove('active');
+currentIndex = (currentIndex + 1) % images.length;
+images[currentIndex].classList.add('active');
+}, 5000);
+}
+
+initCarousel('image-carousel-1');
+initCarousel('image-carousel');
+</script>
+</body>
+</html>
+
+
+
            
            
        
