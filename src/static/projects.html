@@ -5,7 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SAR Imaging Team - Projects</title>
   <link rel="stylesheet" href="/static/style.css" />
-  
+  <style>
+    /* Responsive Image Carousel */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: auto;
+      overflow: hidden;
+    }
+
+    .carousel-container img {
+      width: 100%;
+      height: auto;
+      position: absolute;
+      left: 0;
+      top: 0;
+      transition: opacity 1s;
+      opacity: 0;
+    }
+
+    .carousel-container img.active {
+      opacity: 1;
+      position: relative;
+    }
+
+    /* Responsive Navigation */
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0;
+      list-style: none;
+      gap: 10px;
+    }
+
+    nav li {
+      margin: 5px 10px;
+    }
+
+    nav a {
+      text-decoration: none;
+      font-size: 1.1em;
+    }
+
+    /* Header and Text */
+    header, main, footer {
+      padding: 1em;
+      text-align: center;
+    }
+
+    section {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      h3 {
+        font-size: 1.3em;
+      }
+
+      p, li {
+        font-size: 1em;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -106,6 +179,9 @@
   </script>
 </body>
 </html>
+           
+           
+       
            
            
        
