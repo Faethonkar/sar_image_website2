@@ -5,6 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Contact</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .contact-form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 150px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -30,10 +83,70 @@
                 <li>General questions: <a href="mailto:koukos@hna.gr">koukos@hna.gr</a></li>
                 <li>Technical inquiries: <a href="mailto:faethonkar@gmail.com">faethonkar@gmail.com</a></li>
             </ul>
+
+            <div class="contact-form">
+                <h3>Send us a message</h3>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <button type="submit">Send Message</button>
+                </form>
+                <div id="formResponse" class="response-message"></div>
+            </div>
         </div>
     </main>
     <footer>
         <p>&copy; 2025 DBF. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            try {
+                const response = await fetch('/submit_contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('formResponse').textContent = 
+                        'Thank you for your message! We will get back to you soon.';
+                    document.getElementById('formResponse').className = 'response-message success';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    document.getElementById('formResponse').textContent = 
+                        result.message || 'There was an error submitting your message.';
+                    document.getElementById('formResponse').className = 'response-message error';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('formResponse').textContent = 
+                    'There was a network error. Please try again later.';
+                document.getElementById('formResponse').className = 'response-message error';
+            }
+        });
+    </script>
 </body>
 </html>
