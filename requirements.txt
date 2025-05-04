@@ -6,3 +6,4 @@ cryptography==36.0.2
 gunicorn
 psycopg2-binary
 flask-httpauth==4.8.0
+werkzeug==2.3.6
