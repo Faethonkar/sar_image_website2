@@ -33,12 +33,13 @@
             </div>
             <div style="margin-bottom: 20px;">
                 <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
-                <div id="image-carousel-1" style="position: relative; width: 100%; height: 300px; overflow: hidden;">
-                    <img src="/static/images/sar_image1.PNG" alt="Image 1"
-                         style="width: 100%; height: auto; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 1;">
-                    <img src="/static/images/sar_image5.png" alt="Image 2"
-                         style="width: 100%; height: auto; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
-                </div>
+             <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+                 <img src="/static/images/sar_image1.PNG" 
+                       alt="SAR Image 1"
+                       style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+                 <img src="/static/images/sar_image5.png" alt="SAR Image 2"
+                 style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+             </div>
                 <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">
                     Rotating carousel showcasing SAR imagery used for aircraft detection.
                 </p>
@@ -79,14 +80,17 @@
             
             <div style="margin-top: 30px;">
                 <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
-                <div id="image-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden;">
-                    <img src="/static/images/sar_image2.jpg" alt="Image 1"
-                         style="width: 100%; height: auto; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 1;">
-                    <img src="/static/images/sar_image3.jpg" alt="Image 2"
-                         style="width: 100%; height: auto; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
-                         <img src="/static/images/sar_image4.jpg" alt="Image 2"
-                         style="width: 100%; height: auto; position: absolute; left: 50%; transform: translateX(-50%); transition: opacity 1s; opacity: 0;">
-                </div>
+            <div id="image-carousel" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+    <img src="/static/images/sar_image2.jpg" 
+         alt="SAR Image 2"
+         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+    <img src="/static/images/sar_image3.jpg" 
+         alt="SAR Image 3"
+         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+    <img src="/static/images/sar_image4.jpg" 
+         alt="SAR Image 4"
+         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+</div>
                 <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Example of SAR imagery with detected vessels marked for analysis.</p>
             </div>           
             </section>
@@ -95,22 +99,28 @@
     <footer>
         <p>&copy; 2025 DBF. All rights reserved.</p>
     </footer>
-    <script>
-        function initCarousel(carouselId) {
-            const images = document.querySelectorAll(`#${carouselId} img`);
-            let currentIndex = 0;
-    
-            setInterval(() => {
-                images[currentIndex].style.opacity = 0;
-                currentIndex = (currentIndex + 1) % images.length;
-                images[currentIndex].style.opacity = 1;
-            }, 5000);
+  <script>
+    // Auto-cycling carousel (shared function for both carousels)
+    function setupCarousel(carouselId) {
+        let currentIndex = 0;
+        const images = document.querySelectorAll(`#${carouselId} img`);
+        
+        function cycleImages() {
+            images.forEach(img => img.style.opacity = 0);
+            currentIndex = (currentIndex + 1) % images.length;
+            images[currentIndex].style.opacity = 1;
         }
-    
-        // Initialize both carousels
-        initCarousel('image-carousel-1');
-        initCarousel('image-carousel');
-    </script>
+        
+        // Start cycling if there are images
+        if(images.length > 0) {
+            setInterval(cycleImages, 5000);
+        }
+    }
+
+    // Initialize both carousels
+    setupCarousel('image-carousel-1');  // Your first carousel
+    setupCarousel('image-carousel');    // This carousel
+</script>
 </body>
 </html>
 
