@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+from flask_mail import Mail, Message
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -30,8 +31,19 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_secure_temporary_secret_ke
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Email configuration
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'faethonkar@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'dojz ecay ajow byji')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'faethonkar@gmail.com')
+
 # Initialize the database with the app
 db.init_app(app)
+
+# Initialize Flask-Mail
+mail = Mail(app)
 
 # Basic Authentication Setup
 auth = HTTPBasicAuth()
@@ -52,6 +64,26 @@ with app.app_context():
     except Exception as e:
         print(f"Error creating database: {str(e)}")
         raise
+
+def send_confirmation_email(name, email, message):
+    try:
+        subject = "Thank you for contacting us"
+        body = f"""Dear {name},
+
+Thank you for reaching out to us. We have received your message and will get back to you soon.
+
+Here's a copy of your message for your reference:
+{message}
+
+Best regards,
+Your Company Name
+"""
+        msg = Message(subject=subject, recipients=[email], body=body)
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return False
 
 # Route to serve static files
 @app.route('/', defaults={'path': ''})
@@ -93,7 +125,13 @@ def handle_contact_form():
             submission = ContactSubmission(name=name, email=email, message=message)
             db.session.add(submission)
             db.session.commit()
-            return jsonify({'message': 'Form submitted successfully!'})
+            
+            # Send confirmation email
+            email_sent = send_confirmation_email(name, email, message)
+            if not email_sent:
+                return jsonify({'message': 'Form submitted successfully but failed to send confirmation email.'}), 200
+                
+            return jsonify({'message': 'Form submitted successfully! A confirmation email has been sent.'})
         except Exception as e:
             db.session.rollback()
             return jsonify({'message': f'Database error: {str(e)}'}), 500
