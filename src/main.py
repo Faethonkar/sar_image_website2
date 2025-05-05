@@ -32,12 +32,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.office365.com')  # Outlook/Hotmail server
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))  # Outlook uses 587
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'  # Must be True
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'faethonkar@outlook.com')  # Your Outlook email
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'your-password-or-app-password')  # See note below
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'faethonkar@outlook.com')
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')  # Gmail's SMTP server
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))  # Gmail's TLS port (587)
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'  # Required
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'dbf.infocontact@gmail.com')  # Your Gmail address
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'wgvk fzaf fzvj onmz ')  # App password (see below)
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'dbf.infocontact@gmail.com')  # Sender email
 
 # Initialize the database with the app
 db.init_app(app)
