@@ -5,64 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Contact</title>
     <link rel="stylesheet" href="/static/style.css">
-    <style>
-        .contact-form {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        textarea {
-            height: 150px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .response-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
-        }
-    </style>
 </head>
 <body>
     <header>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
-        <p style="font-size: 1.25em;">AI-Powered ATR with Synthetic Aperture Radar (SAR) Technology</p>
+        <p style="font-size: 1.25em;">Science. Strategy. Superiority.</p>
     </header>
     <nav>
         <ul>
@@ -70,30 +17,33 @@
             <li><a href="/about">About Us</a></li>
             <li><a href="/technology">Technology</a></li>
             <li><a href="/projects">Projects</a></li>
+            <li><a href="/consulting">Consulting</a></li>
             <li><a href="/contact">Contact</a></li>
         </ul>
     </nav>
     <main>
         <div class="contact-info">
-            <h3>Contact Us</h3>
+            <h1 style="text-align: left;">Contact Us</h1>
             <p>For inquiries, please reach out to our team:</p>
 
             <div class="contact-form">
                 <h3>Send us a message</h3>
                 <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" name="name" required>
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="name" style="display: block; font-size: 0.9em;">Name:</label>
+                        <input type="text" id="name" name="name" required style="width: 200px; font-size: 0.9em; padding: 5px;">
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="email" style="display: block; font-size: 0.9em;">Email:</label>
+                        <input type="email" id="email" name="email" required style="width: 200px; font-size: 0.9em; padding: 5px;">
                     </div>
-                    <div class="form-group">
-                        <label for="message">Message:</label>
-                        <textarea id="message" name="message" required></textarea>
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="message" style="display: block; font-size: 0.9em;">Message:</label>
+                        <textarea id="message" name="message" required style="width: 200px; height: 80px; font-size: 0.9em; padding: 5px;"></textarea>
                     </div>
-                    <button type="submit">Send Message</button>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button type="submit" style="padding: 10px 20px; font-size: 1em; display: block; margin: 0; width: 100%; max-width: 200px; text-align: center;">Send Message</button>
+                    </div>
                 </form>
                 <div id="formResponse" class="response-message"></div>
             </div>
