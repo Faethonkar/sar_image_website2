@@ -96,35 +96,163 @@
             </div>           
             </section>
         </div>
+
+        <section style="margin-top: 50px; border-top: 2px solid #005580; padding-top: 30px;">
+            <h2 style="font-size: 2em; color: #005580; text-align: center;">Interactive Ship Detection Demo</h2>
+            
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <h3 style="font-size: 1.5em; color: #005580;">Upload SAR Image</h3>
+                        <input type="file" id="ship-image" accept="image/*" style="margin-bottom: 15px;">
+                        <button id="process-btn" style="padding: 10px 20px; background: #005580; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Detect Ships
+                        </button>
+                        <div id="status-message" style="margin: 10px 0; min-height: 20px; font-size: 1.1em;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; gap: 20px;">
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 1.2em; color: #005580;">Original Image</h4>
+                            <img id="original-img" src="" alt="Original Image" style="max-width: 100%; display: none; border: 1px solid #ddd;">
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 1.2em; color: #005580;">Processed Image</h4>
+                            <img id="processed-img" src="" alt="Processed Image" style="max-width: 100%; display: none; border: 1px solid #ddd;">
+                        </div>
+                    </div>
+                    
+                    <div id="results" style="text-align: center; font-size: 1.2em; display: none;">
+                        <p>Ships detected: <span id="ship-count" style="font-weight: bold;">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2025 DBF. All rights reserved.</p>
     </footer>
-  <script>
-    // Auto-cycling carousel (shared function for both carousels)
-    function setupCarousel(carouselId) {
-        let currentIndex = 0;
-        const images = document.querySelectorAll(`#${carouselId} img`);
-        
-        function cycleImages() {
-            images.forEach(img => img.style.opacity = 0);
-            currentIndex = (currentIndex + 1) % images.length;
-            images[currentIndex].style.opacity = 1;
+    <script>
+        // Auto-cycling carousel (shared function for both carousels)
+        function setupCarousel(carouselId) {
+            let currentIndex = 0;
+            const images = document.querySelectorAll(`#${carouselId} img`);
+            
+            function cycleImages() {
+                images.forEach(img => img.style.opacity = 0);
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].style.opacity = 1;
+            }
+            if(images.length > 0) {
+                setInterval(cycleImages, 5000);
+            }
         }
-        
-        // Start cycling if there are images
-        if(images.length > 0) {
-            setInterval(cycleImages, 5000);
-        }
-    }
 
-    // Initialize both carousels
-    setupCarousel('image-carousel-1');  // Your first carousel
-    setupCarousel('image-carousel');    // This carousel
-</script>
+        // Initialize both carousels
+        setupCarousel('image-carousel-1');
+        setupCarousel('image-carousel');
+    </script>
+    <script>
+    document.getElementById('process-btn').addEventListener('click', async function() {
+    const fileInput = document.getElementById('ship-image');
+    const originalImg = document.getElementById('original-img');
+    const processedImg = document.getElementById('processed-img');
+    const resultsDiv = document.getElementById('results');
+    const shipCount = document.getElementById('ship-count');
+    const statusMessage = document.getElementById('status-message');
+    
+    // Reset UI
+    processedImg.style.display = 'none';
+    resultsDiv.style.display = 'none';
+    statusMessage.textContent = '';
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        showStatus('Please select an image first', 'error');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    if (!file.type.match('image.*')) {
+        showStatus('Please select a valid image file (JPEG, PNG)', 'error');
+        return;
+    }
+    
+    // Display original preview
+    displayImagePreview(file, originalImg);
+    toggleProcessingState(true, this);
+    showStatus('Processing image...', 'info');
+    
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/detect_ships', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Processing failed');
+        }
+        
+        const data = await response.json();
+        
+        // Display processed image with cache busting
+        if (data.processed_image) {
+            processedImg.src = data.processed_image + '?t=' + Date.now();
+            processedImg.style.display = 'block';
+            
+            showStatus(
+                data.num_ships > 0 
+                    ? `Found ${data.num_ships} ship(s)` 
+                    : 'No ships detected',
+                data.num_ships > 0 ? 'success' : 'info'
+            );
+        }
+        
+        shipCount.textContent = data.num_ships;
+        resultsDiv.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showStatus(error.message || 'Error processing image', 'error');
+    } finally {
+        toggleProcessingState(false, this);
+    }
+});
+
+        document.getElementById('ship-image').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+            document.getElementById('processed-img').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('status-message').textContent = '';
+            displayImagePreview(file, document.getElementById('original-img'));
+            }
+        });
+
+        function displayImagePreview(file, imgElement) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block';
+            imgElement.alt = 'Original Uploaded Image';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function toggleProcessingState(isProcessing, button) {
+            button.disabled = isProcessing;
+            button.textContent = isProcessing ? 'Processing...' : 'Detect Ships';
+        }
+
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('status-message');
+            statusElement.textContent = message;
+            statusElement.className = `status-${type}`;
+        }
+    </script>
 </body>
 </html>
-
-           
-           
-       
