@@ -1,0 +1,1 @@
+from models.contact_submission import db, ContactSubmission
