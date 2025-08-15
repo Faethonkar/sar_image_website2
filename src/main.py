@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory, request, jsonify, make_response
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-from src.models.contact_submission import db, ContactSubmission
+from models.contact_submission import db, ContactSubmission
 
 # Initialize Flask app
 app = Flask(__name__, 
