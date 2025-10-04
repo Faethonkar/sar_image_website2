@@ -123,21 +123,21 @@
                 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 1.5em; color: #005580;">Οπτικά Στοιχεία</h3>
-                 <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+                 <div id="image-carousel-greek" class="image-carousel" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                      <img src="/static/images/sar_image1.PNG" 
                            alt="SAR Image 1"
-                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 1;">
                      <img src="/static/images/sar_image5.png" alt="SAR Image 2"
-                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image2.jpg" 
                           alt="SAR Image 3"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image3.jpg" 
                           alt="SAR Image 4"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image4.jpg" 
-                          alt="SAR Image 4"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          alt="SAR Image 5"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                 </div>
                 <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Παράδειγμα εικόνων SAR με σημειωμένα ανιχνευμένα πλοία για ανάλυση.</p>
                 </div>           
@@ -160,21 +160,21 @@
                 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 1.5em; color: #005580;">Visuals</h3>
-                 <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+                 <div id="image-carousel-english" class="image-carousel" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                      <img src="/static/images/sar_image1.PNG" 
                            alt="SAR Image 1"
-                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 1;">
                      <img src="/static/images/sar_image5.png" alt="SAR Image 2"
-                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image2.jpg" 
                           alt="SAR Image 3"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image3.jpg" 
                           alt="SAR Image 4"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                      <img src="/static/images/sar_image4.jpg" 
-                          alt="SAR Image 4"
-                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                          alt="SAR Image 5"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 1s ease; opacity: 0;">
                 </div>
                 <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Example of SAR imagery with detected vessels marked for analysis.</p>
                 </div>           
@@ -217,25 +217,36 @@
         localStorage.setItem('preferredLanguage', lang);
     }
 
-    // Load saved language preference on page load
+    // Image carousel functionality for automatic rotation
+    function initializeCarousel() {
+        const carousels = document.querySelectorAll('.image-carousel');
+        
+        carousels.forEach((carousel, carouselIndex) => {
+            const images = carousel.querySelectorAll('img');
+            let currentImageIndex = 0;
+            const totalImages = images.length;
+            
+            function showNextImage() {
+                if (totalImages > 1) {
+                    images[currentImageIndex].style.opacity = '0';
+                    currentImageIndex = (currentImageIndex + 1) % totalImages;
+                    images[currentImageIndex].style.opacity = '1';
+                }
+            }
+            
+            // Start rotation after a small delay for each carousel to create staggered effect
+            setTimeout(() => {
+                setInterval(showNextImage, 4000); // Rotate every 4 seconds
+            }, carouselIndex * 500);
+        });
+    }
+    
+    // Initialize carousels when page loads
     document.addEventListener('DOMContentLoaded', function() {
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
+        initializeCarousel();
     });
-
-    // Image carousel functionality
-    let currentImageIndex = 0;
-    const images = document.querySelectorAll('#image-carousel-1 img');
-    const totalImages = images.length;
-
-    function showNextImage() {
-        images[currentImageIndex].style.opacity = '0';
-        currentImageIndex = (currentImageIndex + 1) % totalImages;
-        images[currentImageIndex].style.opacity = '1';
-    }
-
-    // Auto-rotate images every 3 seconds
-    setInterval(showNextImage, 3000);
     </script>
 </body>
 </html>
