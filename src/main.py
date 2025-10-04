@@ -5,9 +5,16 @@ import json
 from datetime import datetime
 from pathlib import Path
 from PIL import Image
-from ultralytics import YOLO
 import base64
 from io import BytesIO
+
+# Try to import YOLO - graceful fallback for deployment
+try:
+    from ultralytics import YOLO
+    YOLO_AVAILABLE = True
+except ImportError:
+    print("Warning: ultralytics not available. YOLO ship detection will be disabled.")
+    YOLO_AVAILABLE = False
 
 # Load environment variables from .env file
 try:
@@ -304,16 +311,34 @@ def detect_ships():
 
         # Process image
         img = Image.open(upload_path)
-        model = YOLO(os.path.join(Path(__file__).parent.parent, "src", "models", "yolo", "best.pt"))
-        results = model(img)
-        result = results[0]
         
-        # Count detections
-        num_ships = len([box for box in result.boxes if box.conf >= 0.3])
-        
-        # Create processed image in memory
-        processed_img = Image.fromarray(result.plot())
-        
+        if YOLO_AVAILABLE:
+            # YOLO processing available
+            try:
+                model_path = os.path.join(Path(__file__).parent.parent, "src", "models", "yolo", "best.pt")
+                if os.path.exists(model_path):
+                    model = YOLO(model_path)
+                    results = model(img)
+                    result = results[0]
+                    
+                    # Count detections
+                    num_ships = len([box for box in result.boxes if box.conf >= 0.3])
+                    
+                    # Create processed image in memory
+                    processed_img = Image.fromarray(result.plot())
+                else:
+                    # Model file not found
+                    num_ships = 0
+                    processed_img = img
+            except Exception as e:
+                print(f"YOLO processing error: {e}")
+                num_ships = 0
+                processed_img = img
+        else:
+            # YOLO not available - return original image
+            num_ships = 0
+            processed_img = img
+            
         # Convert to base64 for temporary display
         buffered = BytesIO()
         processed_img.save(buffered, format="JPEG")
@@ -323,7 +348,7 @@ def detect_ships():
             'num_ships': num_ships,
             'processed_image': f"data:image/jpeg;base64,{img_str}",
             'uploaded_image': url_for('serve_uploaded_image', filename=upload_filename),
-            'message': 'No ships detected' if num_ships == 0 else None
+            'message': 'Ship detection unavailable in deployment mode' if not YOLO_AVAILABLE else ('No ships detected' if num_ships == 0 else None)
         })
 
     except Exception as e:
