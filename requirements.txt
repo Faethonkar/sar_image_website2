@@ -1,13 +1,6 @@
 Flask==3.1.0
-Flask-SQLAlchemy==3.1.1
-PyMySQL==1.1.1
-SQLAlchemy==2.0.40
-cryptography==36.0.2
-gunicorn
-psycopg2-binary
+gunicorn==23.0.0
 flask-httpauth==4.8.0
 werkzeug==3.1.0
-Pillow==10.0.0  # This is the maintained version of PIL
-ultralytics==8.2.0
-python-dotenv==1.0.0
-torch==2.2.1
+Pillow==10.4.0
+python-dotenv==1.0.1
