@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Projects - DBF Science Technology",
-            "url": "https://www.dbfsciencetechnology.gr/projects"
-        }
-        </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Projects - DBF Science Technology",
+        "url": "https://www.dbfsciencetechnology.gr/projects"
+    }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Projects</title>
@@ -55,280 +55,187 @@
 </head>
 <body>
     <header>
+        <div class="language-toggle">
+            <button class="lang-btn active" onclick="switchLanguage('el')" id="btn-el">ΕΛ</button>
+            <button class="lang-btn" onclick="switchLanguage('en')" id="btn-en">EN</button>
+        </div>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
-        <p style="font-size: 1.25em;">Science. Strategy. Superiority.</p>
+        <div class="lang-content active" id="header-el">
+            <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
+        </div>
+        <div class="lang-content" id="header-en">
+            <p style="font-size: 1.25em;">Science. Strategy. Superiority.</p>
+        </div>
     </header>
+    
     <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/technology">Technology</a></li>
-            <li><a href="/projects">Projects</a></li>
-            <li><a href="/consulting">Consulting</a></li>
-            <li><a href="/contact">Contact</a></li>
-        </ul>
+        <!-- Greek Navigation -->
+        <div class="lang-content active" id="nav-el">
+            <ul>
+                <li><a href="/">Αρχική</a></li>
+                <li class="dropdown">
+                    <a href="#">Υπηρεσίες</a>
+                    <div class="dropdown-content">
+                        <a href="/intelligence">Πληροφορίες</a>
+                        <a href="/maritime">Ναυτικά</a>
+                        <a href="/cybersecurity">Κυβερνοασφάλεια</a>
+                        <a href="/consulting">Συμβουλευτικές</a>
+                    </div>
+                </li>
+                <li><a href="/technology">Τεχνολογία</a></li>
+                <li><a href="/projects">Έργα</a></li>
+                <li><a href="/contact">Επικοινωνία</a></li>
+            </ul>
+        </div>
+        <!-- English Navigation -->
+        <div class="lang-content" id="nav-en">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li class="dropdown">
+                    <a href="#">Services</a>
+                    <div class="dropdown-content">
+                        <a href="/intelligence">Intelligence</a>
+                        <a href="/maritime">Maritime</a>
+                        <a href="/cybersecurity">Cybersecurity</a>
+                        <a href="/consulting">Consulting</a>
+                    </div>
+                </li>
+                <li><a href="/technology">Technology</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
     </nav>
+    
     <main>
-        <div class="placeholder">
-            <section>
-            <h2 style="font-size: 2em; margin-bottom: 20px; color: #005580;">Project Showcase: AI Algorithms for Vessel and Aircraft Detection</h2>
-            
-            <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1.5em; color: #005580;">Objective</h3>
-            <p style="font-size: 1.2em;">
-            The goal of this project is to develop advanced AI algorithms for the accurate detection and classification of vessels and aircraft from Synthetic Aperture Radar (SAR) imagery. These algorithms aim to improve maritime surveillance, enhance situational awareness, and provide reliable data for defense and commercial applications.
-            </p>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
-             <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
-                 <img src="/static/images/sar_image1.PNG" 
-                       alt="SAR Image 1"
-                       style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
-                 <img src="/static/images/sar_image5.png" alt="SAR Image 2"
-                 style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
-             </div>
-                <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-                    Rotating carousel showcasing SAR imagery used for aircraft detection.
+        <!-- Greek Content -->
+        <div class="lang-content active" id="main-el">
+            <div class="placeholder">
+                <section>
+                <h2 style="font-size: 2em; margin-bottom: 20px; color: #005580;">Παρουσίαση Έργου: Αλγόριθμοι AI για Ανίχνευση Πλοίων και Αεροσκαφών</h2>
+                
+                <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.5em; color: #005580;">Στόχος</h3>
+                <p style="font-size: 1.2em;">
+                Ο στόχος αυτού του έργου είναι η ανάπτυξη προηγμένων αλγορίθμων AI για την ακριβή ανίχνευση και ταξινόμηση πλοίων και αεροσκαφών από εικόνες Synthetic Aperture Radar (SAR). Αυτοί οι αλγόριθμοι στοχεύουν στη βελτίωση της ναυτικής επιτήρησης, την ενίσχυση της επίγνωσης κατάστασης και την παροχή αξιόπιστων δεδομένων για αμυντικές και εμπορικές εφαρμογές.
                 </p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 1.5em; color: #005580;">Οπτικά Στοιχεία</h3>
+                 <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+                     <img src="/static/images/sar_image1.PNG" 
+                           alt="SAR Image 1"
+                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+                     <img src="/static/images/sar_image5.png" alt="SAR Image 2"
+                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image2.jpg" 
+                          alt="SAR Image 3"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image3.jpg" 
+                          alt="SAR Image 4"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image4.jpg" 
+                          alt="SAR Image 4"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                </div>
+                <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Παράδειγμα εικόνων SAR με σημειωμένα ανιχνευμένα πλοία για ανάλυση.</p>
+                </div>           
+                </section>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1.5em; color: #005580;">Methodology</h3>
-            <p style="font-size: 1.2em;">
-            The project follows a multi-step approach involving:
-            <ul style="font-size: 1.2em;">
-                <li>Data Collection: Gathering SAR imagery from various sources, including satellite and airborne sensors.</li>
-                <li>Data Preprocessing: Enhancing SAR images by removing noise and improving resolution for better analysis.</li>
-                <li>AI Model Development: Using deep learning techniques, such as <strong>Convolutional Neural Networks (CNNs)</strong>, to train models on annotated data for vessel and aircraft detection.</li>
-                <li>Testing & Optimization: Validating model performance and optimizing for real-time detection across various conditions.</li>
-            </ul>
-            </p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1.5em; color: #005580;">Results</h3>
-            <p style="font-size: 1.2em;">
-            The developed AI models demonstrated high accuracy in detecting vessels and aircraft from SAR imagery. Key results include:
-            <ul style="font-size: 1.2em;">
-                <li>Detection of distinct vessel types in <strong>maritime environments</strong>.</li>
-                <li>Successful detection of aircraft, even in challenging weather conditions or low visibility.</li>
-                <li>Near Real-time processing capabilities, <strong>low detection time</strong>.</li>
-            </ul>
-            </p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1.5em; color: #005580;">Case Study</h3>
-            <p style="font-size: 1.2em;">
-            In a recent case study focused on maritime surveillance, the AI model demonstrated exceptional performance by detecting vessels in restricted waters. 
-            It achieved a detection accuracy exceeding 90%, greatly improving situational awareness and operational efficiency for naval missions. 
-            </p>
-            </div>
-            
-            <div style="margin-top: 30px;">
-                <h3 style="font-size: 1.5em; color: #005580; text-align: center;">Visuals</h3>
-            <div id="image-carousel" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
-    <img src="/static/images/sar_image2.jpg" 
-         alt="SAR Image 2"
-         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
-    <img src="/static/images/sar_image3.jpg" 
-         alt="SAR Image 3"
-         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
-    <img src="/static/images/sar_image4.jpg" 
-         alt="SAR Image 4"
-         style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
-</div>
+        </div>
+        
+        <!-- English Content -->
+        <div class="lang-content" id="main-en">
+            <div class="placeholder">
+                <section>
+                <h2 style="font-size: 2em; margin-bottom: 20px; color: #005580;">Project Showcase: AI Algorithms for Vessel and Aircraft Detection</h2>
+                
+                <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.5em; color: #005580;">Objective</h3>
+                <p style="font-size: 1.2em;">
+                The goal of this project is to develop advanced AI algorithms for the accurate detection and classification of vessels and aircraft from Synthetic Aperture Radar (SAR) imagery. These algorithms aim to improve maritime surveillance, enhance situational awareness, and provide reliable data for defense and commercial applications.
+                </p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 1.5em; color: #005580;">Visuals</h3>
+                 <div id="image-carousel-1" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden;">
+                     <img src="/static/images/sar_image1.PNG" 
+                           alt="SAR Image 1"
+                           style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 1;">
+                     <img src="/static/images/sar_image5.png" alt="SAR Image 2"
+                     style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image2.jpg" 
+                          alt="SAR Image 3"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image3.jpg" 
+                          alt="SAR Image 4"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                     <img src="/static/images/sar_image4.jpg" 
+                          alt="SAR Image 4"
+                          style="width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; transition: opacity 0.5s ease; opacity: 0;">
+                </div>
                 <p style="text-align: center; font-size: 1.2em; margin-top: 10px;">Example of SAR imagery with detected vessels marked for analysis.</p>
-            </div>           
-            </section>
+                </div>           
+                </section>
+            </div>
         </div>
     </main>
+    
+    <!-- Footer with Language Support -->
     <footer>
-        <p>&copy; 2025 DBF. All rights reserved.</p>
-    </footer>
-    
-        <h2 style="font-size: 2em; color: #005580; text-align: center;">Test With Your Own Image</h2>
-        
-        <div class="demo-container">
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <h3 style="font-size: 1.5em; color: #005580;">Upload SAR Image</h3>
-                    <input type="file" id="ship-image" accept="image/*" style="margin-bottom: 15px;">
-                    <button id="process-btn" style="padding: 10px 20px; background: #005580; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Detect Objects
-                    </button>
-                    <div id="status-message" style="margin: 10px 0; min-height: 20px; font-size: 1.1em;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; gap: 20px;">
-                    <div style="flex: 1;">
-                        <h4 style="font-size: 1.2em; color: #005580;">Original Image</h4>
-                        <img id="original-img" src="" alt="Original Image" style="max-width: 100%; display: none; border: 1px solid #ddd;">
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="font-size: 1.2em; color: #005580;">Processed Image</h4>
-                        <img id="processed-img" src="" alt="Processed Image" style="max-width: 100%; display: none; border: 1px solid #ddd;">
-                    </div>
-                </div>
-                
-                <div id="results" style="display: none;">
-                    <p>Ships detected: <span id="ship-count" style="font-weight: bold;">0</span></p>
-                </div>
-                
-                <div id="save-section" class="save-section">
-                    <button id="save-btn" class="save-btn">Save Both Images</button>
-                    <div id="save-confirmation">
-                        Both images saved successfully!
-                    </div>
-                </div>
-            </div>
+        <div class="lang-content active" id="footer-el">
+            <p>&copy; 2025 DBF. Όλα τα δικαιώματα κατοχυρωμένα.</p>
         </div>
-    </section>
+        <div class="lang-content" id="footer-en">
+            <p>&copy; 2025 DBF. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        let currentFile = null;
-        let currentProcessedImageData = null;
-
-        document.getElementById('ship-image').addEventListener('change', function(e) {
-            // Only preview the image, don't save it
-            const file = e.target.files[0];
-            currentFile = file;
-            
-            if (file) {
-                // Reset display
-                document.getElementById('processed-img').style.display = 'none';
-                document.getElementById('results').style.display = 'none';
-                document.getElementById('save-section').style.display = 'none';
-                document.getElementById('save-confirmation').style.display = 'none';
-                document.getElementById('status-message').textContent = '';
-                
-                // Preview the selected image
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imgElement = document.getElementById('original-img');
-                    imgElement.src = event.target.result;
-                    imgElement.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+    function switchLanguage(lang) {
+        // Hide all language content
+        const allContent = document.querySelectorAll('.lang-content');
+        allContent.forEach(content => {
+            content.classList.remove('active');
         });
-
-        document.getElementById('process-btn').addEventListener('click', async function() {
-            if (!currentFile) {
-                showStatus('Please select an image first', 'error');
-                return;
-            }
-
-            const statusMessage = document.getElementById('status-message');
-            statusMessage.textContent = 'Processing image...';
-            statusMessage.style.color = 'blue';
-            
-            try {
-                const formData = new FormData();
-                formData.append('file', currentFile);
-                
-                const response = await fetch('/detect_ships', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) throw new Error('Processing failed');
-                
-                const data = await response.json();
-                currentProcessedImageData = data.processed_image;
-                
-                // Display results
-                document.getElementById('processed-img').src = data.processed_image;
-                document.getElementById('processed-img').style.display = 'block';
-                document.getElementById('ship-count').textContent = data.num_ships;
-                document.getElementById('results').style.display = 'block';
-                document.getElementById('save-section').style.display = 'block';
-                
-                showStatus(
-                    data.num_ships > 0 ? `Found ${data.num_ships} ship(s)` : 'No ships detected',
-                    data.num_ships > 0 ? 'success' : 'info'
-                );
-                
-            } catch (error) {
-                showStatus('Error processing image: ' + error.message, 'error');
-                console.error('Processing error:', error);
-            }
+        
+        // Show selected language content
+        const selectedContent = document.querySelectorAll(`[id$="-${lang}"]`);
+        selectedContent.forEach(content => {
+            content.classList.add('active');
         });
-
-        document.getElementById('save-btn').addEventListener('click', async function() {
-            if (!currentFile || !currentProcessedImageData) {
-                showStatus("No images to save", 'error');
-                return;
-            }
-            
-            const saveBtn = this;
-            saveBtn.disabled = true;
-            showStatus('Saving images...', 'info');
-            
-            try {
-                const timestamp = Date.now();
-                const originalFilename = `upload_${timestamp}_${currentFile.name}`;
-                const processedFilename = `processed_${timestamp}.jpg`;
-                
-                // Save original (as multipart form)
-                const originalFormData = new FormData();
-                originalFormData.append('file', currentFile);
-                originalFormData.append('filename', originalFilename);
-                
-                await fetch('/save_image', {
-                    method: 'POST',
-                    body: originalFormData
-                });
-                
-                // Save processed (as JSON)
-                await fetch('/save_image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        image_data: currentProcessedImageData,
-                        filename: processedFilename
-                    })
-                });
-                
-                document.getElementById('save-confirmation').style.display = 'block';
-                showStatus('', '');
-                
-            } catch (error) {
-                showStatus("Error saving images: " + error.message, 'error');
-            } finally {
-                saveBtn.disabled = false;
-            }
+        
+        // Update button states
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
+        document.getElementById(`btn-${lang}`).classList.add('active');
+        
+        // Store language preference
+        localStorage.setItem('preferredLanguage', lang);
+    }
 
-        function showStatus(message, type) {
-            const element = document.getElementById('status-message');
-            element.textContent = message;
-            element.className = type ? `status-${type}` : '';
-        }
-    </script>
-    
-    <script>
-        // Auto-cycling carousel (shared function for both carousels)
-        function setupCarousel(carouselId) {
-            let currentIndex = 0;
-            const images = document.querySelectorAll(`#${carouselId} img`);
-            
-            function cycleImages() {
-                images.forEach(img => img.style.opacity = 0);
-                currentIndex = (currentIndex + 1) % images.length;
-                images[currentIndex].style.opacity = 1;
-            }
-            
-            // Start cycling if there are images
-            if(images.length > 0) {
-                setInterval(cycleImages, 5000);
-            }
-        }
+    // Load saved language preference on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferredLanguage') || 'el';
+        switchLanguage(savedLang);
+    });
 
-        // Initialize both carousels
-        setupCarousel('image-carousel-1');  // Your first carousel
-        setupCarousel('image-carousel');    // This carousel
+    // Image carousel functionality
+    let currentImageIndex = 0;
+    const images = document.querySelectorAll('#image-carousel-1 img');
+    const totalImages = images.length;
+
+    function showNextImage() {
+        images[currentImageIndex].style.opacity = '0';
+        currentImageIndex = (currentImageIndex + 1) % totalImages;
+        images[currentImageIndex].style.opacity = '1';
+    }
+
+    // Auto-rotate images every 3 seconds
+    setInterval(showNextImage, 3000);
     </script>
 </body>
 </html>

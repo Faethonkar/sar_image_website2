@@ -32,7 +32,7 @@ ADMIN_PASSWORD=your_new_password
 - Export to CSV functionality
 - Real-time data refresh
 
-## 🚀 Features:
+## Features:
 
 ### Contact Form:
 - ✅ Saves all messages to database

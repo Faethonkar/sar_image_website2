@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Contact - DBF Science Technology",
+            "url": "https://www.dbfsciencetechnology.gr/contact"
+        }
+        </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR Imaging Team - Contact</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
+        <p style="font-size: 1.25em;">Science. Strategy. Superiority.</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/technology">Technology</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/intelligence">Intelligence</a></li>
+            <li><a href="/maritime">Maritime</a></li>
+            <li><a href="/cybersecurity">Cybersecurity</a></li>
+            <li><a href="/consulting">Consulting</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div class="contact-info">
+            <h1 style="text-align: left;">Contact Us</h1>
+            <p>For inquiries, please reach out to our team:</p>
+
+            <div class="contact-form">
+                <h3>Send us a message</h3>
+                <form id="contactForm">
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="name" style="display: block; font-size: 0.9em;">Name:</label>
+                        <input type="text" id="name" name="name" required style="width: 200px; font-size: 0.9em; padding: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="email" style="display: block; font-size: 0.9em;">Email:</label>
+                        <input type="email" id="email" name="email" required style="width: 200px; font-size: 0.9em; padding: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 10px;"></div>
+                        <label for="message" style="display: block; font-size: 0.9em;">Message:</label>
+                        <textarea id="message" name="message" required style="width: 200px; height: 80px; font-size: 0.9em; padding: 5px;"></textarea>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button type="submit" style="padding: 10px 20px; font-size: 1em; display: block; margin: 0; width: 100%; max-width: 200px; text-align: center;">Send Message</button>
+                    </div>
+                </form>
+                <div id="formResponse" class="response-message"></div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 DBF. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            try {
+                const response = await fetch('/submit_contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('formResponse').textContent = 
+                        'Thank you for your message!\nWe will get back to you soon. Please check your junk folder if you do not see a response.';
+                    document.getElementById('formResponse').className = 'response-message success';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    document.getElementById('formResponse').textContent = 
+                        result.message || 'There was an error submitting your message.';
+                    document.getElementById('formResponse').className = 'response-message error';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('formResponse').textContent = 
+                    'There was a network error. Please try again later.';
+                document.getElementById('formResponse').className = 'response-message error';
+            }
+        });
+    </script>
+</body>
+</html>
