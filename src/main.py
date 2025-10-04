@@ -1,11 +1,21 @@
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'  # Add this line first
 import sys
+import json
 from datetime import datetime
 from pathlib import Path
 from PIL import Image
-from flask_mail import Mail, Message
 from ultralytics import YOLO
-import tempfile
+import base64
+from io import BytesIO
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("python-dotenv not installed. Install it with: pip install python-dotenv")
+    print("Environment variables will be loaded from system environment only.")
 
 
 # DON'T CHANGE THIS !!!
@@ -15,51 +25,47 @@ from flask import Flask, send_from_directory, request, jsonify, make_response, u
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from src.models.contact_submission import db, ContactSubmission
 
 # Initialize Flask app
 app = Flask(__name__, 
-            static_folder=os.path.join(os.path.dirname(__file__), 'static'),
+            static_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'static'),
             instance_relative_config=True,
             instance_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance'))
 
-# Configuration for SQLite (local database)
+# Set the correct static folder path
+static_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'static')
+app.static_folder = static_folder
+
+# Then create subfolders
+for folder in ['uploads', 'processed']:
+    os.makedirs(os.path.join(static_folder, folder), exist_ok=True)
+
+# Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
 instance_path = os.path.join(basedir, 'instance')
 
 # Ensure the instance directory exists
 Path(instance_path).mkdir(parents=True, exist_ok=True)
 
-# Database configuration - using contact_submissions.db
-db_path = os.path.join(instance_path, 'contact_submissions.db')
+# JSON file for contact submissions
+submissions_file = os.path.join(instance_path, 'contact_submissions.json')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_secure_temporary_secret_key')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Add these with your other configurations
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['PROCESSED_FOLDER'] = 'static/processed'
+# Change these configurations:
+app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'uploads')
+app.config['PROCESSED_FOLDER'] = os.path.join(app.static_folder, 'processed')
+
+# Then ensure the directories exist:
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
 
-# Email configuration
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'dbf.infocontact@gmail.com')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'wgvk fzaf fzvj onmz ')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'dbf.infocontact@gmail.com')
-
-# Initialize the database with the app
-db.init_app(app)
-
-# Initialize Flask-Mail
-mail = Mail(app)
-
 # Basic Authentication Setup
 auth = HTTPBasicAuth()
+admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+admin_password = os.getenv('ADMIN_PASSWORD', 'defaultpassword')
 users = {
-    "admin": generate_password_hash(os.getenv('ADMIN_PASSWORD', 'defaultpassword'), method='pbkdf2:sha256')
+    admin_username: generate_password_hash(admin_password, method='pbkdf2:sha256')
 }
 
 @auth.verify_password
@@ -67,34 +73,93 @@ def verify_password(username, password):
     if username in users and check_password_hash(users.get(username), password):
         return username
 
-# Create database tables if they don't exist
-with app.app_context():
+# JSON storage functions
+def load_submissions():
+    """Load contact submissions from JSON file"""
     try:
-        db.create_all()
-        print(f"Database created successfully at: {db_path}")
+        if os.path.exists(submissions_file):
+            with open(submissions_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # Ensure data is a list
+                if isinstance(data, list):
+                    return data
+                else:
+                    print(f"Invalid data format in {submissions_file}, expected list")
+                    return []
+        return []
+    except json.JSONDecodeError as e:
+        print(f"JSON decode error loading submissions: {e}")
+        return []
     except Exception as e:
-        print(f"Error creating database: {str(e)}")
-        raise
+        print(f"Error loading submissions: {e}")
+        return []
 
-def send_confirmation_email(name, email, message):
+def save_submissions(submissions):
+    """Save contact submissions to JSON file"""
     try:
-        subject = "Thank you for contacting us"
-        body = f"""Dear {name},
-
-Thank you for reaching out to us. We have received your message and will get back to you soon.
-
-Here's a copy of your message for your reference:
-{message}
-
-Best regards,
-Your Company Name
-"""
-        msg = Message(subject=subject, recipients=[email], body=body)
-        mail.send(msg)
+        with open(submissions_file, 'w', encoding='utf-8') as f:
+            json.dump(submissions, f, indent=2, ensure_ascii=False)
         return True
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error saving submissions: {e}")
         return False
+
+def add_submission(name, email, message):
+    """Add a new contact submission"""
+    submissions = load_submissions()
+    
+    # Check for duplicate email
+    for sub in submissions:
+        if sub['email'] == email:
+            return False, "Email already exists"
+    
+    # Create new submission
+    new_submission = {
+        'id': len(submissions) + 1,
+        'name': name,
+        'email': email,
+        'message': message,
+        'submitted_at': datetime.now().isoformat(),
+        'admin_comment': '',
+        'status': 'new'  # new, replied, archived
+    }
+    
+    submissions.append(new_submission)
+    
+    if save_submissions(submissions):
+        return True, "Submission saved successfully"
+    else:
+        return False, "Error saving submission"
+
+def update_submission_comment(submission_id, comment, status='replied'):
+    """Update admin comment and status for a submission"""
+    submissions = load_submissions()
+    
+    for sub in submissions:
+        if sub['id'] == submission_id:
+            sub['admin_comment'] = comment
+            sub['status'] = status
+            if save_submissions(submissions):
+                return True, "Comment updated successfully"
+            else:
+                return False, "Error saving comment"
+    
+    return False, "Submission not found"
+
+def delete_submission(submission_id):
+    """Delete a submission by ID"""
+    submissions = load_submissions()
+    
+    # Find and remove the submission
+    for i, sub in enumerate(submissions):
+        if sub['id'] == submission_id:
+            del submissions[i]
+            if save_submissions(submissions):
+                return True, "Submission deleted successfully"
+            else:
+                return False, "Error deleting submission"
+    
+    return False, "Submission not found"
 
 # Route to serve static files
 @app.route('/', defaults={'path': ''})
@@ -104,15 +169,27 @@ def serve(path):
     if static_folder_path is None:
         return "Static folder not configured", 404
 
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path + '.html')):
-        return send_from_directory(static_folder_path, path + '.html')
-    elif path != "" and os.path.exists(os.path.join(static_folder_path, path)):
+    # Check if path is a file
+    file_path = os.path.join(static_folder_path, path)
+    if os.path.isfile(file_path):
         return send_from_directory(static_folder_path, path)
-    else:
-        index_path = os.path.join(static_folder_path, 'index.html')
+    
+    # Check if path is a directory with index.html
+    if os.path.isdir(file_path):
+        index_path = os.path.join(file_path, 'index.html')
         if os.path.exists(index_path):
-            return send_from_directory(static_folder_path, 'index.html')
-        return "index.html not found", 404
+            return send_from_directory(static_folder_path, os.path.join(path, 'index.html'))
+    
+    # Check for HTML file with .html extension
+    if not path.endswith('.html') and os.path.exists(os.path.join(static_folder_path, path + '.html')):
+        return send_from_directory(static_folder_path, path + '.html')
+    
+    # Default to index.html if nothing else matches
+    index_path = os.path.join(static_folder_path, 'index.html')
+    if os.path.exists(index_path):
+        return send_from_directory(static_folder_path, 'index.html')
+    
+    return "File not found", 404
 
 # Contact form submission
 @app.route('/submit_contact', methods=['POST'])
@@ -128,56 +205,82 @@ def handle_contact_form():
         if '@' not in email or '.' not in email.split('@')[-1]:
             return jsonify({'status': 'error', 'message': 'Invalid email format.'}), 400
 
-        existing_submission = ContactSubmission.query.filter_by(email=email).first()
-        if existing_submission:
-            return jsonify({'message': 'Error: Email already exists.'}), 400
-
-        try:
-            submission = ContactSubmission(name=name, email=email, message=message)
-            db.session.add(submission)
-            db.session.commit()
-            
-            # Send confirmation email
-            email_sent = send_confirmation_email(name, email, message)
-            if not email_sent:
-                return jsonify({'message': 'Form submitted successfully but failed to send confirmation email.'}), 200
-                
-            return jsonify({'message': 'Form submitted successfully! A confirmation email has been sent.'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': f'Database error: {str(e)}'}), 500
+        success, msg = add_submission(name, email, message)
+        if success:
+            return jsonify({'message': 'Form submitted successfully! Your message has been saved and will be reviewed.'})
+        else:
+            return jsonify({'message': f'Error: {msg}'}), 400
 
     return jsonify({'status': 'error', 'message': 'Method not allowed'}), 405
+
+# Admin page to view submissions (protected)
+@app.route('/admin', methods=['GET'])
+@auth.login_required
+def admin_page():
+    return send_from_directory(app.static_folder, 'admin.html')
 
 # Admin route to view submissions (protected)
 @app.route('/admin/submissions', methods=['GET'])
 @auth.login_required
 def view_submissions():
-    submissions = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).all()
-    submissions_data = [{
-        'id': s.id,
-        'name': s.name,
-        'email': s.email,
-        'message': s.message,
-        'submitted_at': s.submitted_at.isoformat() if s.submitted_at else None
-    } for s in submissions]
-    return jsonify(submissions_data)
+    try:
+        submissions = load_submissions()
+        # Sort by submitted_at in descending order (newest first)
+        if submissions:
+            submissions.sort(key=lambda x: x.get('submitted_at', ''), reverse=True)
+        return jsonify(submissions)
+    except Exception as e:
+        print(f"Error in view_submissions: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # Admin route to export submissions as CSV (protected)
 @app.route('/admin/export', methods=['GET'])
 @auth.login_required
 def export_submissions():
-    submissions = ContactSubmission.query.all()
+    submissions = load_submissions()
     
     # Generate CSV content
-    csv_content = "ID,Name,Email,Message,Submitted At\n"
+    csv_content = "ID,Name,Email,Message,Submitted At,Status,Admin Comment\n"
     for sub in submissions:
-        csv_content += f"{sub.id},{sub.name},{sub.email},\"{sub.message}\",{sub.submitted_at}\n"
+        # Escape quotes in message and comment
+        message = sub['message'].replace('"', '""')
+        comment = sub.get('admin_comment', '').replace('"', '""')
+        csv_content += f"{sub['id']},{sub['name']},{sub['email']},\"{message}\",{sub['submitted_at']},{sub.get('status', 'new')},\"{comment}\"\n"
     
     response = make_response(csv_content)
     response.headers['Content-Type'] = 'text/csv'
     response.headers['Content-Disposition'] = 'attachment; filename=submissions.csv'
     return response
+
+# Admin route to update submission comment (protected)
+@app.route('/admin/submissions/<int:submission_id>/comment', methods=['POST'])
+@auth.login_required
+def update_comment(submission_id):
+    try:
+        data = request.get_json()
+        comment = data.get('comment', '')
+        status = data.get('status', 'replied')
+        
+        success, message = update_submission_comment(submission_id, comment, status)
+        if success:
+            return jsonify({'message': message})
+        else:
+            return jsonify({'error': message}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Admin route to delete submission (protected)
+@app.route('/admin/submissions/<int:submission_id>', methods=['DELETE'])
+@auth.login_required
+def delete_submission_route(submission_id):
+    try:
+        success, message = delete_submission(submission_id)
+        if success:
+            return jsonify({'message': message})
+        else:
+            return jsonify({'error': message}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/detect_ships', methods=['POST'])
 def detect_ships():
@@ -193,46 +296,102 @@ def detect_ships():
         if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             return jsonify({'error': 'Invalid file type'}), 400
 
-        # Create paths and ensure directories exist
-        processed_dir = os.path.join(app.static_folder, 'processed')
-        os.makedirs(processed_dir, exist_ok=True)
-        
-        # Create unique filename
+        # Save original upload
         timestamp = int(datetime.now().timestamp())
-        filename = secure_filename(f"{timestamp}_{file.filename}")
-        processed_path = os.path.join(processed_dir, filename)
-        
+        upload_filename = secure_filename(f"{timestamp}_{file.filename}")
+        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], upload_filename)
+        file.save(upload_path)
+
         # Process image
-        img = Image.open(file.stream)
+        img = Image.open(upload_path)
         model = YOLO(os.path.join(Path(__file__).parent.parent, "src", "models", "yolo", "best.pt"))
         results = model(img)
         result = results[0]
         
-        # Get detection results
+        # Count detections
         num_ships = len([box for box in result.boxes if box.conf >= 0.3])
         
-        # Save processed image
+        # Create processed image in memory
         processed_img = Image.fromarray(result.plot())
-        processed_img.save(processed_path)
-
-        # Return relative URL path
+        
+        # Convert to base64 for temporary display
+        buffered = BytesIO()
+        processed_img.save(buffered, format="JPEG")
+        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
         return jsonify({
             'num_ships': num_ships,
-            'processed_image': f"/static/processed/{filename}",
+            'processed_image': f"data:image/jpeg;base64,{img_str}",
+            'uploaded_image': url_for('serve_uploaded_image', filename=upload_filename),
             'message': 'No ships detected' if num_ships == 0 else None
         })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/save_image', methods=['POST'])
+def save_image():
+    try:
+        if request.headers['Content-Type'] == 'application/json':
+            # Handling processed image (JSON)
+            data = request.get_json()
+            if not data or 'image_data' not in data:
+                return jsonify({'error': 'No image data provided'}), 400
+            
+            # Extract base64 data
+            image_data = data['image_data'].split(',')[1]  # Remove data:image/jpeg;base64 prefix
+            image_bytes = base64.b64decode(image_data)
+            
+            # Generate filename
+            filename = data.get('filename', f"{int(datetime.now().timestamp())}_detection.jpg")
+            filepath = os.path.join(app.config['PROCESSED_FOLDER'], filename)
+            
+            # Save the processed image
+            with open(filepath, 'wb') as f:
+                f.write(image_bytes)
+            
+            return jsonify({
+                'message': 'Processed image saved successfully',
+                'saved_path': url_for('serve_processed_image', filename=filename)
+            })
+        else:
+            # Handling original image (multipart/form-data)
+            if 'file' not in request.files:
+                return jsonify({'error': 'No file uploaded'}), 400
+            
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({'error': 'No selected file'}), 400
+            
+            # Use provided filename or generate one
+            filename = request.form.get('filename', secure_filename(f"{int(datetime.now().timestamp())}_{file.filename}"))
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # Save the original image
+            file.save(filepath)
+            
+            return jsonify({
+                'message': 'Original image saved successfully',
+                'saved_path': url_for('serve_uploaded_image', filename=filename)
+            })
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-
+    
 @app.route('/static/processed/<filename>')
 def serve_processed_image(filename):
     processed_dir = os.path.join(app.static_folder, 'processed')
     return send_from_directory(processed_dir, filename)
         
+@app.route('/static/uploads/<filename>')
+def serve_uploaded_image(filename):
+    upload_dir = os.path.join(app.static_folder, 'uploads')
+    return send_from_directory(upload_dir, filename)
+
 if __name__ == '__main__':
     # Create the instance directory if it doesn't exist
     if not os.path.exists(os.path.join(basedir, 'instance')):
         os.makedirs(os.path.join(basedir, 'instance'))
+    
     app.run(host='0.0.0.0', port=5000, debug=False)

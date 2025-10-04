@@ -7,8 +7,7 @@ gunicorn
 psycopg2-binary
 flask-httpauth==4.8.0
 werkzeug==3.1.0
-flask-mail==0.9.1
 Pillow==10.0.0  # This is the maintained version of PIL
 ultralytics==8.2.0
 python-dotenv==1.0.0
-torch==2.5.1
+torch==2.2.1
