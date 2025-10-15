@@ -4,9 +4,12 @@ import sys
 import json
 from datetime import datetime
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import base64
 from io import BytesIO
+import numpy as np
+import torch
+import torchvision
 
 # Try to import YOLO - graceful fallback for deployment
 try:
@@ -15,6 +18,16 @@ try:
 except ImportError:
     print("Warning: ultralytics not available. YOLO ship detection will be disabled.")
     YOLO_AVAILABLE = False
+
+# Try to import EfficientDet - graceful fallback for deployment
+try:
+    from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
+    from effdet.efficientdet import HeadNet
+    import effdet
+    EFFICIENTDET_AVAILABLE = True
+except ImportError:
+    print("Warning: effdet not available. EfficientDet detection will be disabled.")
+    EFFICIENTDET_AVAILABLE = False
 
 # Load environment variables from .env file
 try:
