@@ -1,8 +1,14 @@
 # Environment variables and sensitive configuration
 .env
 *.env
+.env.local
 
-# Instance data (contains user submissions)
+# Admin credentials and sensitive files
+ADMIN_CREDENTIALS.md
+admin_credentials.md
+
+# Instance data (contains user submissions and local database)
+instance/
 src/instance/*.json
 src/instance/*.db
 
@@ -50,10 +56,16 @@ src/static/uploads/*
 src/static/processed/*
 !src/static/processed/.gitkeep
 
-# Local development scripts
+# Local development scripts (not needed in production)
 simple_start.py
 start_sar_system.py
 start_sar_system.bat
+local_*.py
+test_*.py
+
+# Development documentation
+README_gradio_client.md
+*_client.md
 
 # OS generated files
 .DS_Store
