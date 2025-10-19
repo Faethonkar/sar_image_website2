@@ -451,6 +451,26 @@ def serve_uploaded_image(filename):
 # Global variable to cache working client connection
 _active_client = None
 _active_service_url = None
+_connection_status = "not_initialized"
+
+def initialize_sar_connection():
+    """Initialize SAR connection at startup"""
+    global _connection_status
+    print("🔌 Initializing SAR analysis connection at startup...")
+    _connection_status = "initializing"
+    
+    try:
+        client, url = get_sar_client()
+        if client and url:
+            _connection_status = "connected"
+            service_name = "Hugging Face Space" if "huggingface" in url else "Local Gradio Server"
+            print(f"✅ SAR connection established: {service_name} ({url})")
+        else:
+            _connection_status = "failed"
+            print("❌ Failed to establish SAR connection at startup")
+    except Exception as e:
+        _connection_status = "error"
+        print(f"⚠️ Error during SAR connection initialization: {e}")
 
 def resize_image_if_needed(image_path, max_size=1024):
     """
@@ -691,13 +711,16 @@ def sar_status():
             'gradio_client_installed': True,
             'active_service': active_url,
             'services': services,
-            'connection_cached': client is not None
+            'connection_cached': client is not None,
+            'initialization_status': _connection_status,
+            'auto_connection': True
         })
         
     except ImportError:
         return jsonify({
             'gradio_client_installed': False,
-            'error': 'gradio_client not installed'
+            'error': 'gradio_client not installed',
+            'initialization_status': _connection_status
         })
 
 # Auto-connect endpoint to establish connection proactively
@@ -735,6 +758,11 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join(basedir, 'instance')):
         os.makedirs(os.path.join(basedir, 'instance'))
     
+    # Initialize SAR connection automatically at startup
+    print("🚀 Starting SAR Analysis Website...")
+    initialize_sar_connection()
+    
+    print("🌐 Starting Flask server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
 
 
