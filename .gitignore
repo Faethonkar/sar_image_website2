@@ -50,11 +50,6 @@ src/static/uploads/*
 src/static/processed/*
 !src/static/processed/.gitkeep
 
-# Test results
-test_results/
-local_test_results/
-yolo_results/
-
 # Local development scripts
 simple_start.py
 start_sar_system.py

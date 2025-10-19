@@ -13,6 +13,7 @@ import torch
 import torchvision
 import requests  # For Hugging Face API interaction
 import certifi
+import shutil
 
 # Ensure requests/ssl use certifi's CA bundle (helps in environments with broken/default certs)
 ca_bundle = certifi.where()
@@ -420,6 +421,25 @@ def save_image():
 def serve_processed_image(filename):
     processed_dir = os.path.join(app.static_folder, 'processed')
     return send_from_directory(processed_dir, filename)
+
+@app.route('/download/processed/<filename>')
+def download_processed_image(filename):
+    """Download processed SAR image with proper filename"""
+    try:
+        # Create a user-friendly filename
+        timestamp = filename.split('_')[0]
+        download_name = f"sar_analysis_result_{timestamp}.jpg"
+        
+        processed_dir = os.path.join(app.static_folder, 'processed')
+        return send_from_directory(
+            processed_dir, 
+            filename, 
+            as_attachment=True,
+            download_name=download_name
+        )
+    except Exception as e:
+        print(f"Download error: {e}")
+        return "File not found", 404
         
 @app.route('/static/uploads/<filename>')
 def serve_uploaded_image(filename):
@@ -431,6 +451,41 @@ def serve_uploaded_image(filename):
 # Global variable to cache working client connection
 _active_client = None
 _active_service_url = None
+
+def resize_image_if_needed(image_path, max_size=1024):
+    """
+    Resize image if it's larger than max_size while maintaining aspect ratio
+    Returns the path to the resized image (or original if no resize needed)
+    """
+    try:
+        with Image.open(image_path) as img:
+            # Get current dimensions
+            width, height = img.size
+            
+            # Check if resize is needed
+            if max(width, height) <= max_size:
+                return image_path  # No resize needed
+            
+            # Calculate new dimensions maintaining aspect ratio
+            if width > height:
+                new_width = max_size
+                new_height = int(height * max_size / width)
+            else:
+                new_height = max_size
+                new_width = int(width * max_size / height)
+            
+            # Resize the image
+            resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save resized image (overwrite original for processing)
+            resized_img.save(image_path, quality=85, optimize=True)
+            
+            print(f"📏 Image resized from {width}x{height} to {new_width}x{new_height}")
+            return image_path
+            
+    except Exception as e:
+        print(f"⚠️ Image resize failed: {e}")
+        return image_path  # Return original path if resize fails
 
 def get_sar_client():
     """Get or establish connection to SAR analysis service"""
@@ -515,6 +570,9 @@ def analyze_sar():
         temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(temp_path)
         
+        # Resize image if needed (max 1024px)
+        temp_path = resize_image_if_needed(temp_path, max_size=1024)
+        
         # Create URL for the uploaded image
         uploaded_image_url = url_for('serve_uploaded_image', filename=filename)
 
@@ -549,11 +607,14 @@ def analyze_sar():
             processed_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
             
             if annotated_image_path and os.path.exists(annotated_image_path):
-                import shutil
+                # Copy and resize the processed image
                 shutil.copy2(annotated_image_path, processed_path)
+                resize_image_if_needed(processed_path, max_size=1024)
                 processed_url = url_for('serve_processed_image', filename=processed_filename)
+                download_url = url_for('download_processed_image', filename=processed_filename)
             else:
                 processed_url = None
+                download_url = None
 
             # Don't clean up the uploaded file - keep it for display
             # The uploaded file will be served via serve_uploaded_image route
@@ -564,6 +625,7 @@ def analyze_sar():
                 'detection_summary': detection_summary,
                 'annotated_image_url': processed_url,
                 'uploaded_image_url': uploaded_image_url,
+                'download_url': download_url,
                 'original_filename': file.filename,
                 'processed_at': datetime.now().isoformat(),
                 'space_used': space_url

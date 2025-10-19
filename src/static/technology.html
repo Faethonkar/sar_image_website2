@@ -141,6 +141,10 @@
             <form id="sar-form" enctype="multipart/form-data" style="margin: 20px 0;">
                 <input type="file" id="sar-file" name="file" accept="image/*" required style="margin-right: 10px;">
                 <button id="sar-submit" type="submit" style="font-size: 1.0em; background-color: #005580; color: white; padding: 8px 16px; border: none; cursor: pointer; border-radius: 4px;">Analyze SAR Image</button>
+                <div style="font-size: 0.85em; color: #666; margin-top: 8px;">
+                    📏 Images will be automatically resized to max 1024px for processing
+                    📁 Max file size: 10MB
+                </div>
             </form>
             
             <div id="sar-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;">
@@ -244,8 +248,20 @@
                 return;
             }
 
+            // Check file size (10MB limit)
+            const file = fileInput.files[0];
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            if (file.size > maxSize) {
+                statusDiv.style.backgroundColor = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                statusText.textContent = `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Please select a file smaller than 10MB.`;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze SAR Image';
+                return;
+            }
+
             const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
+            formData.append('file', file);
 
             try {
                 statusText.textContent = 'Processing image through AI detection model...';
@@ -278,6 +294,14 @@
                         processedImageDiv.innerHTML = `
                             <img src="${data.annotated_image_url}" alt="SAR Detection Results" 
                                  style="max-width: 100%; max-height: 400px; border: 2px solid #28a745; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            ${data.download_url ? `
+                            <div style="margin-top: 15px;">
+                                <a href="${data.download_url}" 
+                                   download="sar_analysis_result.jpg"
+                                   style="display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                    💾 Download Result
+                                </a>
+                            </div>` : ''}
                         `;
                     } else {
                         processedImageDiv.innerHTML = '<p style="color: #666;">Processed image not available.</p>';

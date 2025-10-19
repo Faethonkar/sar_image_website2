@@ -8,6 +8,29 @@ from huggingface_hub import hf_hub_download
 
 # Max upload size in megabytes
 MAX_MB = 5
+# Maximum dimension for processed images
+MAX_PIXELS = 1024
+
+def resize_image_for_processing(image, max_size=MAX_PIXELS):
+    """
+    Resize image if larger than max_size while maintaining aspect ratio
+    """
+    height, width = image.shape[:2]
+    
+    if max(width, height) <= max_size:
+        return image
+    
+    # Calculate new dimensions
+    if width > height:
+        new_width = max_size
+        new_height = int(height * max_size / width)
+    else:
+        new_height = max_size
+        new_width = int(width * max_size / height)
+    
+    resized = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
+    print(f"📏 Resized from {width}x{height} to {new_width}x{new_height}")
+    return resized
 
 def load_model():
     """Load YOLO model with fallback options."""
@@ -74,6 +97,12 @@ def detect(image):
         if size_mb > MAX_MB:
             return None, f"⚠️ Image too large ({size_mb:.2f} MB). Please upload an image smaller than {MAX_MB} MB."
 
+        # Convert PIL image to OpenCV format
+        image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        
+        # Resize image if needed
+        image = resize_image_for_processing(image)
+        
         print(f"Processing image of size: {image.shape}")
         
         # Run YOLO inference

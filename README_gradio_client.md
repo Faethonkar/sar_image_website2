@@ -59,7 +59,7 @@ python gradio_yolo_client.py --space-url https://huggingface.co/spaces/youruser/
 - `--batch`: Process all images in the input directory
 - `--space-url`: Hugging Face Space URL (default: https://huggingface.co/spaces/Faethon88/sar_imaging)
 - `--confidence`: Detection confidence threshold 0.0-1.0 (default: 0.3)
-- `--output`: Output directory for results (default: yolo_results)
+- `--output`: Output directory for results (default: src/static/processed)
 
 ## Output Structure
 
@@ -120,7 +120,7 @@ You can set default values via environment variables:
 ```bash
 export HF_SPACE_URL="https://huggingface.co/spaces/Faethon88/sar_imaging"
 export YOLO_CONFIDENCE="0.3"
-export YOLO_OUTPUT_DIR="yolo_results"
+export YOLO_OUTPUT_DIR="src/static/processed"
 ```
 
 ### Gradio API Compatibility
