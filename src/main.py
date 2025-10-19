@@ -2,6 +2,7 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'  # Add this line first
 import sys
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -10,6 +11,14 @@ from io import BytesIO
 import numpy as np
 import torch
 import torchvision
+import requests  # For Hugging Face API interaction
+import certifi
+
+# Ensure requests/ssl use certifi's CA bundle (helps in environments with broken/default certs)
+ca_bundle = certifi.where()
+os.environ.setdefault('REQUESTS_CA_BUNDLE', ca_bundle)
+os.environ.setdefault('SSL_CERT_FILE', ca_bundle)
+print(f"Using CA bundle: {ca_bundle}")
 
 # Try to import YOLO - graceful fallback for deployment
 try:
@@ -18,16 +27,6 @@ try:
 except ImportError:
     print("Warning: ultralytics not available. YOLO ship detection will be disabled.")
     YOLO_AVAILABLE = False
-
-# Try to import EfficientDet - graceful fallback for deployment
-try:
-    from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
-    from effdet.efficientdet import HeadNet
-    import effdet
-    EFFICIENTDET_AVAILABLE = True
-except ImportError:
-    print("Warning: effdet not available. EfficientDet detection will be disabled.")
-    EFFICIENTDET_AVAILABLE = False
 
 # Load environment variables from .env file
 try:
@@ -41,7 +40,7 @@ except ImportError:
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory, request, jsonify, make_response, url_for
+from flask import Flask, send_from_directory, request, jsonify, make_response, url_for, redirect
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -427,9 +426,259 @@ def serve_uploaded_image(filename):
     upload_dir = os.path.join(app.static_folder, 'uploads')
     return send_from_directory(upload_dir, filename)
 
+
+
+# Global variable to cache working client connection
+_active_client = None
+_active_service_url = None
+
+def get_sar_client():
+    """Get or establish connection to SAR analysis service"""
+    global _active_client, _active_service_url
+    
+    # If we have an active client, test it first
+    if _active_client and _active_service_url:
+        try:
+            # Quick test to see if the connection is still alive
+            print(f"🔄 Testing existing connection to {_active_service_url}")
+            return _active_client, _active_service_url
+        except Exception:
+            print(f"💔 Lost connection to {_active_service_url}, reconnecting...")
+            _active_client = None
+            _active_service_url = None
+    
+    # Connection priority: HF Space -> Local Server
+    service_configs = [
+        {
+            'url': 'https://huggingface.co/spaces/Faethon88/sar_imaging',
+            'name': 'Hugging Face Space',
+            'retries': 2,
+            'timeout': 10
+        },
+        {
+            'url': 'http://127.0.0.1:7860',
+            'name': 'Local Gradio Server', 
+            'retries': 1,
+            'timeout': 5
+        }
+    ]
+    
+    from gradio_client import Client
+    
+    for config in service_configs:
+        for attempt in range(config['retries']):
+            try:
+                if attempt > 0:
+                    print(f"🔄 Retry {attempt + 1}/{config['retries']} for {config['name']}")
+                    time.sleep(3)
+                else:
+                    print(f"🔌 Connecting to {config['name']}...")
+                
+                client = Client(config['url'])
+                _active_client = client
+                _active_service_url = config['url']
+                
+                print(f"✅ Connected to {config['name']} ({config['url']})")
+                return client, config['url']
+                
+            except Exception as e:
+                error_msg = str(e)[:100] + "..." if len(str(e)) > 100 else str(e)
+                if attempt < config['retries'] - 1:
+                    print(f"⏳ {config['name']} attempt {attempt + 1} failed: {error_msg}")
+                else:
+                    print(f"❌ {config['name']} unavailable: {error_msg}")
+    
+    return None, None
+
+# SAR Image Analysis - Send image to Hugging Face Space and return results
+@app.route('/analyze-sar', methods=['POST'])
+def analyze_sar():
+    """
+    Receive an uploaded image, send it to the SAR analysis service,
+    and return the results back to the client.
+    """
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        # Validate file extension
+        if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return jsonify({'error': 'Invalid file type. Please use PNG, JPG, or JPEG.'}), 400
+
+        # Save uploaded file for display (keep original for user to see)
+        timestamp = int(datetime.now().timestamp())
+        filename = secure_filename(f"{timestamp}_{file.filename}")
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(temp_path)
+        
+        # Create URL for the uploaded image
+        uploaded_image_url = url_for('serve_uploaded_image', filename=filename)
+
+        print(f"Processing SAR image: {filename}")
+
+        # Get SAR analysis client with automatic connection management
+        try:
+            client, space_url = get_sar_client()
+            
+            if not client:
+                return jsonify({
+                    'error': 'SAR analysis service unavailable',
+                    'details': 'Could not connect to any analysis service. Please ensure local Gradio server is running.'
+                }), 503
+
+            # Send image for analysis using the correct format we discovered
+            result = client.predict({"path": temp_path}, api_name="/predict")
+            
+            if not result or len(result) < 2:
+                return jsonify({
+                    'error': 'Invalid response from SAR analysis service'
+                }), 502
+
+            # Extract results
+            annotated_image_path = result[0]  # Path to annotated image
+            detection_summary = result[1]     # Text summary
+            
+            print(f"Analysis complete: {detection_summary}")
+
+            # Copy annotated image to processed folder for serving
+            processed_filename = f"{timestamp}_sar_result.jpg"
+            processed_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
+            
+            if annotated_image_path and os.path.exists(annotated_image_path):
+                import shutil
+                shutil.copy2(annotated_image_path, processed_path)
+                processed_url = url_for('serve_processed_image', filename=processed_filename)
+            else:
+                processed_url = None
+
+            # Don't clean up the uploaded file - keep it for display
+            # The uploaded file will be served via serve_uploaded_image route
+
+            # Return results
+            return jsonify({
+                'success': True,
+                'detection_summary': detection_summary,
+                'annotated_image_url': processed_url,
+                'uploaded_image_url': uploaded_image_url,
+                'original_filename': file.filename,
+                'processed_at': datetime.now().isoformat(),
+                'space_used': space_url
+            })
+
+        except ImportError:
+            return jsonify({
+                'error': 'SAR analysis service not available',
+                'details': 'gradio_client not installed'
+            }), 503
+            
+        except Exception as e:
+            print(f"Error during SAR analysis: {e}")
+            return jsonify({
+                'error': 'SAR analysis failed',
+                'details': str(e)
+            }), 500
+
+    except Exception as e:
+        print(f"Error in analyze_sar: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+# Simple redirect to open the Hugging Face Space UI in the user's browser  
+@app.route('/open-space', methods=['GET'])
+def open_space():
+    hf_space_url = os.getenv('HF_SPACE_URL', 'https://huggingface.co/spaces/Faethon88/sar_imaging')
+    return redirect(hf_space_url, code=302)
+
+
+# Status endpoint to check SAR analysis service availability
+@app.route('/sar-status', methods=['GET'])
+def sar_status():
+    """Check if SAR analysis services are available."""
+    try:
+        # Use the auto-connection system to check what's available
+        client, active_url = get_sar_client()
+        
+        services = {
+            'huggingface_space': {'url': 'https://huggingface.co/spaces/Faethon88/sar_imaging', 'status': 'unknown'},
+            'local_server': {'url': 'http://127.0.0.1:7860', 'status': 'unknown'}
+        }
+        
+        if client and active_url:
+            # Mark the active service as available
+            if 'huggingface' in active_url:
+                services['huggingface_space']['status'] = 'available (active)'
+                services['local_server']['status'] = 'not tested (HF working)'
+            else:
+                services['local_server']['status'] = 'available (active)'
+                services['huggingface_space']['status'] = 'unavailable (using local fallback)'
+        else:
+            # Test each service individually
+            from gradio_client import Client
+            for service_name, service_info in services.items():
+                try:
+                    test_client = Client(service_info['url'])
+                    service_info['status'] = 'available'
+                except Exception as e:
+                    service_info['status'] = f'unavailable: {str(e)[:100]}'
+        
+        return jsonify({
+            'gradio_client_installed': True,
+            'active_service': active_url,
+            'services': services,
+            'connection_cached': client is not None
+        })
+        
+    except ImportError:
+        return jsonify({
+            'gradio_client_installed': False,
+            'error': 'gradio_client not installed'
+        })
+
+# Auto-connect endpoint to establish connection proactively
+@app.route('/sar-connect', methods=['POST'])
+def sar_connect():
+    """Proactively establish connection to SAR analysis service."""
+    try:
+        global _active_client, _active_service_url
+        # Reset any cached connection to force reconnection
+        _active_client = None
+        _active_service_url = None
+        
+        client, service_url = get_sar_client()
+        
+        if client:
+            return jsonify({
+                'success': True,
+                'connected_to': service_url,
+                'message': f'Successfully connected to {"Hugging Face Space" if "huggingface" in service_url else "Local Gradio Server"}'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to connect to any SAR analysis service'
+            }), 503
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == '__main__':
     # Create the instance directory if it doesn't exist
     if not os.path.exists(os.path.join(basedir, 'instance')):
         os.makedirs(os.path.join(basedir, 'instance'))
     
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+@app.route('/hf-status', methods=['GET'])
+def hf_status():
+    """Return non-sensitive Hugging Face config status: whether HF_TOKEN is set and HF_MODEL name."""
+    hf_token_present = bool(os.getenv('HF_TOKEN'))
+    hf_model = os.getenv('HF_MODEL') or None
+    return jsonify({'hf_token_present': hf_token_present, 'hf_model': hf_model}), 200

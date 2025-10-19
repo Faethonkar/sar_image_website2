@@ -17,6 +17,48 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Cache and temporary files
+.cache/
+*.cache
+*.tmp
+temp/
+tmp/
+
+# Model files (too large for git)
+*.pt
+*.pth
+*.onnx
+
+# Uploads and processed images (generated at runtime)
+src/static/uploads/*
+!src/static/uploads/.gitkeep
+src/static/processed/*
+!src/static/processed/.gitkeep
+
+# Test results
+test_results/
+local_test_results/
+yolo_results/
+
+# Local development scripts
+simple_start.py
+start_sar_system.py
+start_sar_system.bat
 
 # OS generated files
 .DS_Store

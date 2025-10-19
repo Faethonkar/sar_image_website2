@@ -132,6 +132,44 @@
                 </section>
             </div>
         </div>
+
+        <!-- SAR Image Analysis Section -->
+        <section>
+            <h2 style="font-size: 2em; color: #005580;">SAR Image Analysis</h2>
+            <p>Upload a SAR image here for automated ship and aircraft detection. Our system will process it through our AI model and return annotated results.</p>
+            
+            <form id="sar-form" enctype="multipart/form-data" style="margin: 20px 0;">
+                <input type="file" id="sar-file" name="file" accept="image/*" required style="margin-right: 10px;">
+                <button id="sar-submit" type="submit" style="font-size: 1.0em; background-color: #005580; color: white; padding: 8px 16px; border: none; cursor: pointer; border-radius: 4px;">Analyze SAR Image</button>
+            </form>
+            
+            <div id="sar-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;">
+                <p id="sar-status-text"></p>
+            </div>
+            
+            <div id="sar-results" style="margin-top: 20px; display: none;">
+                <h3 style="color: #005580;">Analysis Results</h3>
+                
+                <!-- Images side by side -->
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px 0; gap: 20px;">
+                    <div style="flex: 1; min-width: 300px; text-align: center;">
+                        <h4 style="color: #005580; margin-bottom: 10px;">Original Image</h4>
+                        <div id="sar-original-image"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 300px; text-align: center;">
+                        <h4 style="color: #005580; margin-bottom: 10px;">Detection Results</h4>
+                        <div id="sar-processed-image"></div>
+                    </div>
+                </div>
+                
+                <!-- Detection Summary -->
+                <div id="sar-summary" style="background: #f6f8fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h4 style="color: #005580; margin-top: 0;">Detection Summary</h4>
+                    <div id="sar-detection-details"></div>
+                    <div id="sar-metadata" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 0.9em; color: #666;"></div>
+                </div>
+            </div>
+        </section>
     </main>
     
     <!-- Footer with Language Support -->
@@ -173,6 +211,141 @@
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
     });
+
+    // SAR Image Analysis Form Handler
+    const sarForm = document.getElementById('sar-form');
+    if (sarForm) {
+        sarForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const statusDiv = document.getElementById('sar-status');
+            const statusText = document.getElementById('sar-status-text');
+            const resultsDiv = document.getElementById('sar-results');
+            const submitBtn = document.getElementById('sar-submit');
+            
+            // Show status and hide results
+            statusDiv.style.display = 'block';
+            statusDiv.style.backgroundColor = '#e3f2fd';
+            statusDiv.style.color = '#1565c0';
+            statusText.textContent = 'Uploading image and connecting to SAR analysis service...';
+            resultsDiv.style.display = 'none';
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Analyzing...';
+
+            const fileInput = document.getElementById('sar-file');
+            if (!fileInput.files.length) {
+                statusDiv.style.backgroundColor = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                statusText.textContent = 'Please select an image file.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze SAR Image';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                statusText.textContent = 'Processing image through AI detection model...';
+                
+                const response = await fetch('/analyze-sar', { 
+                    method: 'POST', 
+                    body: formData 
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Success - show results
+                    statusDiv.style.backgroundColor = '#e8f5e8';
+                    statusDiv.style.color = '#2e7d32';
+                    statusText.textContent = 'Analysis completed successfully!';
+                    
+                    // Show original image
+                    const originalImageDiv = document.getElementById('sar-original-image');
+                    if (data.uploaded_image_url) {
+                        originalImageDiv.innerHTML = `
+                            <img src="${data.uploaded_image_url}" alt="Original SAR Image" 
+                                 style="max-width: 100%; max-height: 400px; border: 2px solid #005580; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        `;
+                    }
+                    
+                    // Show processed image
+                    const processedImageDiv = document.getElementById('sar-processed-image');
+                    if (data.annotated_image_url) {
+                        processedImageDiv.innerHTML = `
+                            <img src="${data.annotated_image_url}" alt="SAR Detection Results" 
+                                 style="max-width: 100%; max-height: 400px; border: 2px solid #28a745; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        `;
+                    } else {
+                        processedImageDiv.innerHTML = '<p style="color: #666;">Processed image not available.</p>';
+                    }
+                    
+                    // Parse and display detection summary
+                    const detectionDetails = document.getElementById('sar-detection-details');
+                    const summary = data.detection_summary || 'No detection information available.';
+                    
+                    // Try to parse detection counts from summary
+                    // Handle both formats: "ships: 3" and "3 ships"
+                    const shipMatches = summary.match(/(?:ships?:\s*(\d+)|(\d+)\s*ships?)/i);
+                    const aircraftMatches = summary.match(/(?:aircrafts?:\s*(\d+)|(\d+)\s*aircrafts?)/i);
+                    
+                    const shipCount = shipMatches ? parseInt(shipMatches[1] || shipMatches[2]) : 0;
+                    const aircraftCount = aircraftMatches ? parseInt(aircraftMatches[1] || aircraftMatches[2]) : 0;
+                    
+                    let detectionHTML = `
+                        <div style="display: flex; justify-content: space-around; margin: 15px 0;">
+                            <div style="text-align: center; padding: 15px; background: #e3f2fd; border-radius: 8px; min-width: 120px;">
+                                <div style="font-size: 2em; font-weight: bold; color: #1565c0;">${shipCount}</div>
+                                <div style="color: #1565c0; font-weight: 500;">Ships Detected</div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #f3e5f5; border-radius: 8px; min-width: 120px;">
+                                <div style="font-size: 2em; font-weight: bold; color: #7b1fa2;">${aircraftCount}</div>
+                                <div style="color: #7b1fa2; font-weight: 500;">Aircrafts Detected</div>
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 10px;">
+                            <strong>Raw Detection Output:</strong><br>
+                            <span style="font-family: monospace; font-size: 0.9em; color: #495057;">${summary}</span>
+                        </div>
+                    `;
+                    
+                    detectionDetails.innerHTML = detectionHTML;
+                    
+                    // Show metadata
+                    const metadataDiv = document.getElementById('sar-metadata');
+                    metadataDiv.innerHTML = `
+                        <strong>File:</strong> ${data.original_filename} | 
+                        <strong>Processed:</strong> ${new Date(data.processed_at).toLocaleString()} | 
+                        <strong>Service:</strong> ${data.space_used.includes('huggingface') ? 'Hugging Face Space' : 'Local Server'}
+                    `;
+                    
+                    resultsDiv.style.display = 'block';
+                    
+                } else {
+                    // Error from server
+                    statusDiv.style.backgroundColor = '#ffebee';
+                    statusDiv.style.color = '#c62828';
+                    statusText.textContent = `Analysis failed: ${data.error}`;
+                    if (data.details) {
+                        statusText.textContent += ` (${data.details})`;
+                    }
+                }
+                
+            } catch (err) {
+                // Network or other error
+                statusDiv.style.backgroundColor = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                statusText.textContent = `Upload failed: ${err.message}`;
+            }
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Analyze SAR Image';
+        });
+    }
     </script>
 </body>
 </html>
