@@ -1,1 +1,1 @@
-web: python railway_start.py
+web: cd src && gunicorn --bind 0.0.0.0:$PORT --workers ${WEB_CONCURRENCY:-2} main:app

@@ -14,3 +14,4 @@ gradio>=4.0.0
 gradio-client>=1.0.0
 opencv-python-headless>=4.8.0
 huggingface-hub>=0.17.0
+waitress>=2.2.0
