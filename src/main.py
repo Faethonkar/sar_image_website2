@@ -596,6 +596,14 @@ def analyze_sar():
 
         print(f"Processing SAR image: {filename}")
 
+        # Read confidence threshold from form data (default to 0.5)
+        try:
+            confidence = float(request.form.get('confidence', request.form.get('conf', 0.5)))
+            # clamp
+            confidence = max(0.0, min(1.0, confidence))
+        except Exception:
+            confidence = 0.5
+
         # Get SAR analysis client with automatic connection management
         try:
             client, space_url = get_sar_client()
@@ -640,13 +648,14 @@ def analyze_sar():
 
             # Try multiple JSON-serializable payload formats for gradio_client.predict.
             # Order: direct Image dict (preferred), dict with named field, list wrapper, uploaded_ref (if any), path fallbacks.
+            # Include confidence in payload where supported
             predict_attempts = [
-                (lambda: client.predict(image_data_obj, api_name="/predict")),
-                (lambda: client.predict({"image": image_data_obj}, api_name="/predict")),
-                (lambda: client.predict([image_data_obj], api_name="/predict")),
-                # If upload returned a host reference, try using it directly
-                (lambda: client.predict(uploaded_ref, api_name="/predict") if uploaded_ref else (_ for _ in ()).throw(Exception('no upload_ref'))),
-                (lambda: client.predict({"path": temp_path}, api_name="/predict")),
+                (lambda: client.predict({**image_data_obj, 'meta': {'confidence': confidence}}, api_name="/predict")),
+                (lambda: client.predict({'image': image_data_obj, 'confidence': confidence}, api_name="/predict")),
+                (lambda: client.predict([image_data_obj, confidence], api_name="/predict")),
+                # If upload returned a host reference, try using it directly with confidence attached
+                (lambda: client.predict({'path': uploaded_ref, 'confidence': confidence}, api_name="/predict") if uploaded_ref else (_ for _ in ()).throw(Exception('no upload_ref'))),
+                (lambda: client.predict({'path': temp_path, 'confidence': confidence}, api_name="/predict")),
                 (lambda: client.predict(temp_path, api_name="/predict"))
             ]
 
@@ -811,6 +820,7 @@ def analyze_sar():
                 'download_url': download_url,
                 'original_filename': file.filename,
                 'processed_at': datetime.now().isoformat(),
+                'confidence': confidence,
                 'space_used': space_url
             })
 

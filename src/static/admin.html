@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Contact Submissions</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/banner.css">
     <style>
         .admin-container {
             max-width: 1400px;
@@ -202,8 +203,15 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1 style="font-size: 2.5em;">DBF Science Technology - Admin Panel</h1>
+        <header>
+                <div class="sar-banner-container">
+                    <div id="sar-test-banner" class="sar-banner" role="region" aria-label="Test SAR Model banner">
+                        <div class="sar-banner-text">🔔 Test our TEST SAR MODEL</div>
+                        <button id="sar-test-cta" class="sar-banner-cta">Try it</button>
+                        <button id="sar-test-close" class="sar-banner-close" aria-label="Close">&times;</button>
+                    </div>
+                </div>
+                <h1 style="font-size: 2.5em;">DBF Science Technology - Admin Panel</h1>
         <p style="font-size: 1.25em;">Contact Submissions Management</p>
     </header>
     
@@ -474,5 +482,7 @@
         // Load submissions when page loads
         document.addEventListener('DOMContentLoaded', loadSubmissions);
     </script>
+    
+    <script src="/static/banner.js"></script>
 </body>
 </html>

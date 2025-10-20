@@ -23,13 +23,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maritime - DBF Science Technology</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
-    <header>
-        <div class="language-toggle">
-            <button class="lang-btn active" onclick="switchLanguage('el')" id="btn-el">ΕΛ</button>
-            <button class="lang-btn" onclick="switchLanguage('en')" id="btn-en">EN</button>
+        <!-- SAR test banner (shared, top-left) -->
+        <div id="sar-test-banner" class="sar-banner" role="region" aria-label="Test SAR Model banner" style="position:fixed; left:8px; top:8px; z-index:1000;">
+            <div class="sar-banner-text">🔔 Test our TEST SAR MODEL</div>
+            <button id="sar-test-cta" class="sar-banner-cta">Try it</button>
+            <button id="sar-test-close" class="sar-banner-close" aria-label="Close">&times;</button>
         </div>
+    <header>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
             <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
@@ -296,5 +299,6 @@
         switchLanguage(savedLang);
     });
     </script>
+    <script src="/static/banner.js"></script>
 </body>
 </html>

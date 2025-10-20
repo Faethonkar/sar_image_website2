@@ -1,0 +1,23 @@
+/* Responsive SAR Test Banner styles */
+#sar-test-banner.sar-banner{display:none;background:#fffbeb;border:1px solid #ffe08a;padding:10px 12px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.08);z-index:9999;font-weight:600;color:#333;display:flex;gap:8px;align-items:center;cursor:grab;touch-action:none;max-width:360px}
+#sar-test-banner.sar-banner .sar-banner-text{font-size:0.95em;margin-right:8px}
+#sar-test-banner.sar-banner .sar-banner-cta{background:#1976d2;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+#sar-test-banner.sar-banner .sar-banner-close{background:transparent;border:none;font-size:1.2em;margin-left:8px;cursor:pointer;color:#666}
+
+/* Small screens: center and expand the banner to be touch-friendly */
+@media (max-width: 640px){
+  /* On small screens fallback to fixed positioning so banner doesn't break header layout */
+  #sar-test-banner.sar-banner{position:fixed;right:8px;top:8px;max-width:320px;width:calc(50%);border-radius:8px;padding:10px}
+}
+
+/* If the banner is inside the header wrapper, align it to the right of the header by default */
+.header-banner-wrap .sar-banner{position:absolute; right:0; top:0;}
+
+/* Ensure banner does not overlap the language toggle: when header is wide enough, push banner right of toggle via inline script placement logic */
+.language-toggle { display:inline-block; position:relative; z-index:10000 }
+
+/* Medium screens: slightly smaller max-width */
+@media (min-width: 641px) and (max-width: 1024px){
+  #sar-test-banner.sar-banner{max-width:420px}
+}
+

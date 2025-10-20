@@ -23,13 +23,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Technology</title>
     <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
-    <header>
-        <div class="language-toggle">
-            <button class="lang-btn active" onclick="switchLanguage('el')" id="btn-el">ΕΛ</button>
-            <button class="lang-btn" onclick="switchLanguage('en')" id="btn-en">EN</button>
+        <!-- SAR test banner (shared, top-left) -->
+        <div id="sar-test-banner" class="sar-banner" role="region" aria-label="Test SAR Model banner" style="position:fixed; left:8px; top:8px; z-index:1000;">
+            <div class="sar-banner-text">🔔 Test our TEST SAR MODEL</div>
+            <button id="sar-test-cta" class="sar-banner-cta">Try it</button>
+            <button id="sar-test-close" class="sar-banner-close" aria-label="Close">&times;</button>
         </div>
+    <header>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
             <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
@@ -138,13 +141,13 @@
         <!-- SAR Image Analysis / Detection Section (embedded) -->
         <section style="margin-top: 28px;">
             <div style="text-align:center;">
-                <h2 style="font-size: 2em; color: #005580;">
-                    <span class="lang-content" id="sar-title-el">Δοκιμή Μοντέλου SAR</span>
-                    <span class="lang-content" id="sar-title-en">Test SAR Model</span>
-                </h2>
+                <h2 id="test-sar-section" style="font-size: 2em; color: #005580;">
+                            <span class="lang-content" id="sar-title-el">Δοκιμή Μοντέλου SAR</span>
+                            <span class="lang-content" id="sar-title-en">Test SAR Model</span>
+                        </h2>
                 <p style="color:#555; max-width:900px; margin: 6px auto 18px auto;">
                     <span class="lang-content" id="sar-desc-el">Μπορείτε να ανεβάσετε μια εικόνα SAR για ανίχνευση πλοίων και αεροσκαφών. Η ανάλυση θα εκτελεστεί μέσω του SAR AI service.</span>
-                    <span class="lang-content" id="sar-desc-en">You can upload a SAR image for ship and aircraft detection. Analysis is performed via our SAR AI service.</span>
+                    <span class="lang-content" id="sar-desc-en">You can upload a SAR image for ship and aircraft detection (resolution 1-3m). Analysis is performed via our SAR AI service.</span>
                 </p>
 
                 <!-- Single form shared across languages; language-specific labels inside -->
@@ -164,9 +167,17 @@
                                 <span class="lang-content" id="sar-submit-en">Analyze SAR Image</span>
                             </button>
                         </div>
-                        <div style="min-width:220px; text-align:center;">
-                            <a href="https://huggingface.co/spaces/Faethon88/sar_imaging" target="_blank" style="display:inline-block; background:#28a745; color:#fff; padding:10px 14px; border-radius:6px; text-decoration:none;">Open on Hugging Face</a>
+                        <div style="min-width:320px; text-align:center;">
+                            <label style="display:block; font-weight:600; margin-bottom:6px; color: #1976d2;"> 
+                                <span class="lang-content" id="conf-label-el">Κατώφλι Εμπιστοσύνης</span>
+                                <span class="lang-content" id="conf-label-en">Confidence Threshold</span>
+                            </label>
+                            <input id="sar-confidence" name="confidence" type="range" min="0.1" max="1.0" step="0.05" value="0.5" style="width:70%;">
+                            <div style="margin-top:6px; font-weight:600; color: #1976d2;">
+                                <span id="sar-confidence-value">50%</span>
+                            </div>
                         </div>
+                        <!-- Link to external Space removed for security / UX at user's request -->
                     </div>
 
                     <div id="sar-status" style="display:none; margin-top:14px; padding:12px; border-radius:6px;">
@@ -224,6 +235,15 @@
         switchLanguage(savedLang);
     });
 
+    // Update confidence display
+    const confSlider = document.getElementById('sar-confidence');
+    const confDisplay = document.getElementById('sar-confidence-value');
+    if (confSlider && confDisplay) {
+        confDisplay.textContent = Math.round(parseFloat(confSlider.value) * 100) + '%';
+        confSlider.addEventListener('input', function() {
+            confDisplay.textContent = Math.round(parseFloat(confSlider.value) * 100) + '%';
+        });
+    }
     // SAR Image Analysis Form Handler
     const sarForm = document.getElementById('sar-form');
     if (sarForm) {
@@ -270,6 +290,10 @@
 
             const formData = new FormData();
             formData.append('file', file);
+            // Attach confidence value
+            const confInput = document.getElementById('sar-confidence');
+            const confValue = parseFloat(confInput ? confInput.value : 0.5);
+            formData.append('confidence', confValue);
 
             try {
                 statusText.textContent = 'Processing image through AI detection model...';
@@ -351,7 +375,8 @@
                     metadataDiv.innerHTML = `
                         <strong>File:</strong> ${data.original_filename} | 
                         <strong>Processed:</strong> ${new Date(data.processed_at).toLocaleString()} | 
-                        <strong>Service:</strong> ${data.space_used.includes('huggingface') ? 'Hugging Face Space' : 'Local Server'}
+                        <strong>Service:</strong> ${data.space_used.includes('huggingface') ? 'Hugging Face Space' : 'Local Server'} | 
+                        <strong>Confidence:</strong> ${Math.round((data.confidence || confValue) * 100)}%
                     `;
                     
                     resultsDiv.style.display = 'block';

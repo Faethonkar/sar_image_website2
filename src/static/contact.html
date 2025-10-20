@@ -23,13 +23,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Contact</title>
     <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
-    <header>
-        <div class="language-toggle">
-            <button class="lang-btn active" onclick="switchLanguage('el')" id="btn-el">ΕΛ</button>
-            <button class="lang-btn" onclick="switchLanguage('en')" id="btn-en">EN</button>
+        <!-- SAR test banner (shared, top-left) -->
+        <div id="sar-test-banner" class="sar-banner" role="region" aria-label="Test SAR Model banner" style="position:fixed; left:8px; top:8px; z-index:1000;">
+            <div class="sar-banner-text">🔔 Test our TEST SAR MODEL</div>
+            <button id="sar-test-cta" class="sar-banner-cta">Try it</button>
+            <button id="sar-test-close" class="sar-banner-close" aria-label="Close">&times;</button>
         </div>
+    <header>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
             <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
@@ -147,67 +150,60 @@
     </footer>
 
     <script>
+    // Language switcher
     function switchLanguage(lang) {
         // Hide all language content
         const allContent = document.querySelectorAll('.lang-content');
-        allContent.forEach(content => {
-            content.classList.remove('active');
-        });
-        
+        allContent.forEach(content => content.classList.remove('active'));
+
         // Show selected language content
         const selectedContent = document.querySelectorAll(`[id$="-${lang}"]`);
-        selectedContent.forEach(content => {
-            content.classList.add('active');
-        });
-        
-        // Update button states
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`btn-${lang}`).classList.add('active');
-        
+        selectedContent.forEach(content => content.classList.add('active'));
+
+        // Update button states (if present)
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        const btn = document.getElementById(`btn-${lang}`);
+        if (btn) btn.classList.add('active');
+
         // Store language preference
-        localStorage.setItem('preferredLanguage', lang);
+        try { localStorage.setItem('preferredLanguage', lang); } catch (e) {}
     }
+
+    // On page load, apply saved language preference
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferredLanguage') || 'el';
+        switchLanguage(savedLang);
+    });
 
     // Contact form handling
     function handleFormSubmit(formId, messageId) {
         const form = document.getElementById(formId);
         const messageDiv = document.getElementById(messageId);
-        
+        if (!form) return;
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
-            
             fetch('/submit_contact', {
                 method: 'POST',
                 body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    messageDiv.innerHTML = '<span style="color: green;">' + data.message + '</span>';
-                    this.reset();
-                } else {
-                    messageDiv.innerHTML = '<span style="color: red;">Error: ' + (data.error || 'Unknown error') + '</span>';
-                }
-            })
-            .catch(error => {
-                messageDiv.innerHTML = '<span style="color: red;">Error submitting form. Please try again.</span>';
+            }).then(resp => {
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                return resp.json();
+            }).then(data => {
+                if (messageDiv) messageDiv.textContent = data.message || 'Message sent.';
+                form.reset();
+            }).catch(err => {
+                if (messageDiv) messageDiv.textContent = 'Error sending message.';
+                console.error(err);
             });
         });
     }
 
-    // Initialize both forms
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedLang = localStorage.getItem('preferredLanguage') || 'el';
-        switchLanguage(savedLang);
-        
-        // Setup form handlers
-        handleFormSubmit('contactForm', 'form-message-el');
-        handleFormSubmit('contactFormEn', 'form-message-en');
-    });
+    // Initialize contact forms
+    handleFormSubmit('contactForm','form-message-el');
+    handleFormSubmit('contactFormEn','form-message-en');
     </script>
+    <script src="/static/banner.js"></script>
 </body>
 </html>

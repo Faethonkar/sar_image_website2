@@ -33,12 +33,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Imaging Team - Home</title>
     <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
+    <!-- SAR test banner: top-left, draggable/dismissible, visible for first-time visitors -->
+    <div id="sar-test-banner" class="sar-banner" role="region" aria-label="Test SAR Model banner" style="position: absolute; left: 0; top: 0; display: block; z-index: 1000;">
+    <div class="sar-banner-text" style="display: inline-block; vertical-align: middle;">🔔 Test our TEST SAR MODEL</div>
+    <button id="sar-test-cta" class="sar-banner-cta" style="display: inline-block; vertical-align: middle; margin-left: 12px;">Try it</button>
+        <button id="sar-test-close" class="sar-banner-close" aria-label="Close">&times;</button>
+    </div>
     <header>
         <div class="language-toggle">
-            <button class="lang-btn active" onclick="switchLanguage('el')" id="btn-el">ΕΛ</button>
-            <button class="lang-btn" onclick="switchLanguage('en')" id="btn-en">EN</button>
+            <button class="lang-btn active" id="btn-el">ΕΛ</button>
+            <button class="lang-btn" id="btn-en">EN</button>
         </div>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
@@ -198,73 +205,41 @@
         </section>
         
         <!-- Collaboration Section -->
-        <div class="mb-4">
-            <div class="lang-content active" id="collab-el">
-                <h4 class="text-info text-center">Δίκτυο Συνεργασίας</h4>
-                <p class="text-center">
-                    Συνεργαζόμαστε με κορυφαίους οργανισμούς για την προώθηση της έρευνας και ανάπτυξης τεχνολογίας SAR.
-                </p>
-            </div>
-            <div class="lang-content" id="collab-en">
-                <h4 class="text-info text-center">Collaboration Network</h4>
-                <p class="text-center">
-                    We collaborate with leading organizations to advance SAR technology research and development.
-                </p>
-            </div>
-        </div>
-
-        <div class="partner-logos-inline" style="display:flex; gap:60px; justify-content:center; align-items:center; flex-wrap:wrap; margin:50px 0 20px;">
-            <a href="https://www.esa.int/" target="_blank" style="text-decoration:none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                <img src="/static/images/esa_logo.jpg" alt="ESA Logo" style="max-width:140px; width:100%; height:auto;">
-            </a>
-            <a href="https://www.iceye.com/" target="_blank" style="text-decoration:none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                <img src="/static/images/iceye_logo.webp" alt="ICEYE Logo" style="max-width:140px; width:100%; height:auto;">
-            </a>
-            <a href="https://rendered.ai/" target="_blank" style="text-decoration:none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                <img src="/static/images/rendered_ai_logo.jpg" alt="Rendered.ai Logo" style="max-width:140px; width:100%; height:auto;">
-            </a>
-        </div>
-    </main>
-
-    <!-- Footer with Language Support -->
-    <footer>
-        <div class="lang-content active" id="footer-el">
-            <p>&copy; 2025 DBF. Όλα τα δικαιώματα κατοχυρωμένα.</p>
-        </div>
-        <div class="lang-content" id="footer-en">
-            <p>&copy; 2025 DBF. All rights reserved.</p>
-        </div>
-    </footer>
+        <div class="mb-4"></div>
 
     <script>
     function switchLanguage(lang) {
         // Hide all language content
         const allContent = document.querySelectorAll('.lang-content');
-        allContent.forEach(content => {
-            content.classList.remove('active');
-        });
-        
+        allContent.forEach(content => content.classList.remove('active'));
+
         // Show selected language content
         const selectedContent = document.querySelectorAll(`[id$="-${lang}"]`);
-        selectedContent.forEach(content => {
-            content.classList.add('active');
-        });
-        
+        selectedContent.forEach(content => content.classList.add('active'));
+
         // Update button states
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`btn-${lang}`).classList.add('active');
-        
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`btn-${lang}`);
+        if (activeBtn) activeBtn.classList.add('active');
+
         // Store language preference
-        localStorage.setItem('preferredLanguage', lang);
+        try { localStorage.setItem('preferredLanguage', lang); } catch(e) {}
     }
 
     // Load saved language preference on page load
     document.addEventListener('DOMContentLoaded', function() {
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
+
+        // Attach click handlers to language buttons (if present)
+        try {
+            const btnEl = document.getElementById('btn-el');
+            const btnEn = document.getElementById('btn-en');
+            if (btnEl) btnEl.addEventListener('click', () => switchLanguage('el'));
+            if (btnEn) btnEn.addEventListener('click', () => switchLanguage('en'));
+        } catch(e) { console.warn('Failed to attach language button handlers', e); }
     });
     </script>
+    <script src="/static/banner.js"></script>
 </body>
 </html>
