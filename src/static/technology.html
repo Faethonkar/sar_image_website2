@@ -143,7 +143,6 @@
                         </h2>
                 <p style="color:#555; max-width:900px; margin: 6px auto 18px auto;">
                     <span class="lang-content" id="sar-desc-el">Μπορείτε να ανεβάσετε μια εικόνα SAR για ανίχνευση πλοίων και αεροσκαφών. Η ανάλυση θα εκτελεστεί μέσω του SAR AI service.</span>
-                    <span class="lang-content" id="sar-desc-en">You can upload a SAR image for ship and aircraft detection (resolution 1-3m). Analysis is performed via our SAR AI service.</span>
                 </p>
 
                 <!-- Single form shared across languages; language-specific labels inside -->
@@ -187,6 +186,23 @@
                         <div id="sar-metadata" style="margin-top:8px; color:#666; font-size:0.95em;"></div>
                     </div>
                 </form>
+            </div>
+        </section>
+        
+        <!-- SAR Images Test Dataset Section -->
+        <section id="sar-images-test" style="margin-top:28px; color:#1976d2;">
+            <div style="max-width:920px; margin:0 auto; background:#fff; padding:18px; border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,0.06); text-align:left;">
+                <p style="color:#090b74; margin:0; font-weight:900;">SAR_images_test — Sample images for object detection</p>
+                <p style="color:#555; text-align:left;">This collection contains representative SAR images you can use to test the object-detection pipeline (ships, small craft, large vessels, aircraft where visible). Images are provided as examples — for production use please supply your own SAR imagery with appropriate licensing.</p>
+                <p style="color:#555; text-align:left;"><strong>Best suited images:</strong> medium-to-high resolution SAR scenes (1–10 m), minimal compression artifacts, with ships visible as bright point-like returns or elongated streaks. Avoid extreme speckle or very low resolution.</p>
+
+                <p style="margin-top:14px; color:#444; font-size:0.95em; text-align:left;">
+                    Download <a href="/images/SAR_images_test.rar" download="SAR_images_test.rar" style="color:inherit; text-decoration:underline;"><strong>SAR_images_test.rar</strong></a> and then upload it using the <em>Test SAR Model</em> form above to run detection against the sample dataset.
+                </p>
+
+                <div style="text-align:left; margin-top:12px;">
+                    <span style="margin-left:0; color:#666; font-size:0.95em;">(ZIP/RAR will download directly; ensure your browser allows .rar files)</span>
+                </div>
             </div>
         </section>
     </main>
