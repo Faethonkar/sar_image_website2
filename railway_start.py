@@ -1,39 +1,23 @@
 #!/usr/bin/env python3
 """
 Production startup script for Railway deployment
+Uses direct SAR model integration instead of separate Gradio server
 """
 
 import os
 import sys
-import threading
-import time
 import subprocess
 from pathlib import Path
 
-def start_gradio_server():
-    """Start Gradio server in background"""
-    print("🚀 Starting Gradio SAR analysis server...")
-    try:
-        # Import and start Gradio app
-        import subprocess
-        subprocess.Popen([sys.executable, "improved_gradio_app.py"])
-        time.sleep(5)  # Give Gradio time to start
-        print("✅ Gradio server started on port 7860")
-    except Exception as e:
-        print(f"⚠️ Gradio server failed to start: {e}")
-        print("🔄 Continuing with Flask only (will use HF Space fallback)")
-
 def main():
     """Main production startup"""
-    print("🌐 SAR Analysis System - Production Mode")
+    print("🌐 SAR Analysis System - Railway Production Mode")
     print("=" * 50)
     
     # Set production environment
     os.environ['FLASK_ENV'] = 'production'
     
-    # Start Gradio server in background thread
-    gradio_thread = threading.Thread(target=start_gradio_server, daemon=True)
-    gradio_thread.start()
+    print("🧠 Using Hugging Face Space for SAR analysis (no local Gradio server)")
     
     # Get port from Railway environment or default to 5000
     port = int(os.environ.get('PORT', 5000))
