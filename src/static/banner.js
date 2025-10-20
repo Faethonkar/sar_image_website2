@@ -166,10 +166,17 @@
     }
 
     if (cta) {
-      cta.addEventListener('click', function() {
+      // Prefer native anchor navigation. Only persist dismissal on pointerdown so we don't
+      // accidentally block or override the default behavior which some environments
+      // (or browser extensions) may intercept.
+      cta.addEventListener('pointerdown', function() {
         try { localStorage.setItem(bannerKey, '1'); } catch (e) {}
-        window.location.href = '/technology#test-sar-section';
-        if (banner) banner.style.display = 'none';
+        // Do not call preventDefault or set window.location here - let the browser follow href.
+        if (banner) {
+          // Hide the banner shortly after pointerdown to give the browser time to navigate
+          // (this also avoids the banner flashing on the destination if navigation is instant).
+          setTimeout(() => { try{ banner.style.display = 'none'; }catch(e){} }, 50);
+        }
       });
     }
 
