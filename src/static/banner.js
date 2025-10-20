@@ -43,7 +43,7 @@
   }
 
   function initBanner() {
-    const dismissed = localStorage.getItem(bannerKey);
+  const dismissed = localStorage.getItem(bannerKey);
     // Don't default to 'el' here — treat absence of a saved preference as "no preference"
     const lang = localStorage.getItem(langKey);
     const banner = document.getElementById('sar-test-banner');
@@ -55,6 +55,15 @@
     const headerBannerWrap = document.querySelector('.header-banner-wrap');
 
     if (!banner) return;
+
+    // Only initialize and show the banner on the site's index page (root or index.html).
+    // On other pages we hide the banner and skip draggable/placement logic.
+    const isIndex = (window.location.pathname === '/' || window.location.pathname === '' || window.location.pathname.endsWith('index.html'));
+    if (!isIndex) {
+      // Ensure the banner stays hidden on non-index pages
+      try { banner.style.display = 'none'; } catch(e){}
+      return;
+    }
 
     // Apply persisted position if present
     let persistedPos = null;
@@ -124,8 +133,8 @@
       } catch(e){}
     }
 
-    // Show the banner on all pages when not dismissed: fixed top-left by default
-    if (!dismissed) {
+  // Show the banner on index page when not dismissed: fixed top-left by default
+  if (!dismissed && isIndex) {
       try {
         // Prefer a header-contained placement if the page provides a headerBannerWrap, otherwise fixed top-left
         if (headerBannerWrap) {
@@ -151,6 +160,7 @@
           banner.style.display = 'flex';
         }
         playBeep();
+        // Make draggable only on index
         makeDraggable(banner);
       } catch (e) { /* ignore */ }
     }
