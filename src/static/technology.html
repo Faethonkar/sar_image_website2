@@ -384,10 +384,12 @@
                     
                     // Show metadata
                     const metadataDiv = document.getElementById('sar-metadata');
+                    const spaceUsed = data.space_used || 'Unknown';
+                    const serviceName = spaceUsed.includes('huggingface') ? 'Hugging Face Space' : 'Local Server';
                     metadataDiv.innerHTML = `
-                        <strong>File:</strong> ${data.original_filename} | 
-                        <strong>Processed:</strong> ${new Date(data.processed_at).toLocaleString()} | 
-                        <strong>Service:</strong> ${data.space_used.includes('huggingface') ? 'Hugging Face Space' : 'Local Server'} | 
+                        <strong>File:</strong> ${data.original_filename || 'Unknown'} | 
+                        <strong>Processed:</strong> ${data.processed_at ? new Date(data.processed_at).toLocaleString() : new Date().toLocaleString()} | 
+                        <strong>Service:</strong> ${serviceName} | 
                         <strong>Confidence:</strong> ${Math.round((data.confidence || confValue) * 100)}%
                     `;
                     
