@@ -346,7 +346,8 @@ def save_image():
             
             return jsonify({
                 'message': 'Processed image saved successfully',
-                'saved_path': url_for('serve_processed_image', filename=filename)
+                'saved_path': url_for('serve_processed_image', filename=filename),
+                'download_url': url_for('download_processed_image', filename=filename)
             })
         else:
             if 'file' not in request.files:
@@ -606,6 +607,7 @@ def analyze_sar():
             'confidence': confidence,
             'detection_summary': summary,
             'annotated_image_url': url_for('serve_processed_image', filename=processed_filename),
+            'download_url': url_for('download_processed_image', filename=processed_filename),
             'uploaded_image_url': url_for('serve_uploaded_image', filename=filename),
             'original_filename': filename,
             'processed_at': datetime.now().isoformat(),
