@@ -796,6 +796,57 @@ def hf_status():
         'hf_model': hf_model
     }), 200
 
+@app.route('/warmup-space', methods=['POST', 'GET'])
+def warmup_space():
+    """Proactively wake the Hugging Face Space before sending an image.
+
+    Optional query/form parameters:
+      timeout: override SPACE_WAKE_TIMEOUT (seconds)
+      interval: override SPACE_WAKE_INTERVAL (seconds)
+      inspect: '1' to attempt listing API endpoints after wake (view_api())
+    """
+    try:
+        client, space_url = get_sar_client()
+        if not client:
+            return jsonify({'success': False, 'error': 'Cannot create client for Space'}), 503
+
+        # Resolve overrides
+        req_timeout = request.args.get('timeout') or request.form.get('timeout')
+        req_interval = request.args.get('interval') or request.form.get('interval')
+        inspect_flag = (request.args.get('inspect') or request.form.get('inspect') or '0') == '1'
+        try:
+            timeout = int(req_timeout) if req_timeout else None
+        except ValueError:
+            timeout = None
+        try:
+            interval = int(req_interval) if req_interval else None
+        except ValueError:
+            interval = None
+
+        start = time.time()
+        woke = wait_for_space_ready(space_url, timeout=timeout, interval=interval)
+        elapsed = time.time() - start
+
+        api_info = None
+        if woke and inspect_flag:
+            try:
+                api_info = client.view_api()
+            except Exception as e:
+                api_info = {'error': f'view_api failed: {str(e)[:200]}'}
+
+        return jsonify({
+            'success': woke,
+            'space_used': space_url,
+            'woke': woke,
+            'elapsed_seconds': round(elapsed, 2),
+            'timeout_used': timeout or int(os.getenv('SPACE_WAKE_TIMEOUT', '120')),
+            'interval_used': interval or int(os.getenv('SPACE_WAKE_INTERVAL', '5')),
+            'api_info': api_info,
+            'timestamp': datetime.now().isoformat()
+        }), (200 if woke else 504)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
     if not os.path.exists(os.path.join(basedir, 'instance')):
         os.makedirs(os.path.join(basedir, 'instance'))
