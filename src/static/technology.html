@@ -241,10 +241,75 @@
         localStorage.setItem('preferredLanguage', lang);
     }
 
-    // Load saved language preference on page load
+    // Load saved language preference on page load and kick off Space warmup
     document.addEventListener('DOMContentLoaded', function() {
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
+
+        // Proactively warm up the backend Space so first analysis doesn't fail on cold start
+        const submitBtn = document.getElementById('sar-submit');
+        const statusDiv = document.getElementById('sar-status');
+        const statusText = document.getElementById('sar-status-text');
+        if (submitBtn && statusDiv && statusText) {
+            // Disable while warming
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Waking service…';
+
+            statusDiv.style.display = 'block';
+            statusDiv.style.backgroundColor = '#fff3cd';
+            statusDiv.style.color = '#856404';
+            statusText.textContent = 'Waking AI service… this can take up to ~2 minutes after inactivity.';
+
+            // Polling strategy: shorter server-side waits, loop client-side until ready or max time
+            const maxTotalMs = 120000; // 120s cap
+            const perCallTimeout = 20000; // 20s per warmup request on server
+            const perCallInterval = 4; // server poll interval seconds
+            const betweenCallsMs = 3000; // wait between requests
+            const startTs = Date.now();
+
+            async function warmupOnce() {
+                try {
+                    const url = `/warmup-space?timeout=${Math.floor(perCallTimeout/1000)}&interval=${perCallInterval}`;
+                    const resp = await fetch(url, { method: 'GET' });
+                    const data = await resp.json().catch(() => ({}));
+                    const elapsed = Math.round((Date.now() - startTs) / 1000);
+                    if (resp.ok && data && (data.success === true || data.woke === true)) {
+                        statusDiv.style.backgroundColor = '#e8f5e8';
+                        statusDiv.style.color = '#2e7d32';
+                        statusText.textContent = 'AI service is ready.';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Analyze SAR Image';
+                        return true;
+                    } else {
+                        statusDiv.style.backgroundColor = '#fff3cd';
+                        statusDiv.style.color = '#856404';
+                        const detail = (data && (data.error || (data.api_info && data.api_info.error))) || 'still waking';
+                        statusText.textContent = `Waking AI service… (${elapsed}s) ${detail}`;
+                        return false;
+                    }
+                } catch (e) {
+                    const elapsed = Math.round((Date.now() - startTs) / 1000);
+                    statusDiv.style.backgroundColor = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusText.textContent = `Waking AI service… (${elapsed}s) network retry`; 
+                    return false;
+                }
+            }
+
+            (async function warmupLoop(){
+                while (Date.now() - startTs < maxTotalMs) {
+                    const ok = await warmupOnce();
+                    if (ok) return;
+                    await new Promise(r => setTimeout(r, betweenCallsMs));
+                }
+                // Timed out warming up
+                statusDiv.style.backgroundColor = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                statusText.textContent = 'AI service did not wake in time. You can still try Analyze; it will retry server-side.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze SAR Image';
+            })();
+        }
     });
 
     // Update confidence display
