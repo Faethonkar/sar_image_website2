@@ -470,6 +470,51 @@ def get_sar_client():
         print(f"❌ Connection failed: {e}")
         return None, None
 
+def wait_for_space_ready(space_url: str, timeout: int = None, interval: int = None) -> bool:
+    """Poll the Hugging Face Space URL until it's awake or timeout reached.
+
+    The Space (Gradio) will return a placeholder page or 503 while cold-starting.
+    We look for known phrases indicating wake-up in progress and retry.
+
+    Environment variables to override defaults:
+      SPACE_WAKE_TIMEOUT  (seconds, default 120)
+      SPACE_WAKE_INTERVAL (seconds, default 5)
+    """
+    timeout = timeout or int(os.getenv('SPACE_WAKE_TIMEOUT', '120'))
+    interval = interval or int(os.getenv('SPACE_WAKE_INTERVAL', '5'))
+    start = time.time()
+    sleeping_markers = [
+        'space is being prepared',
+        'please wait',
+        'starting up',
+        'loading your app'
+    ]
+    print(f"🛌 Checking if Space is awake (timeout={timeout}s, interval={interval}s)...")
+    attempts = 0
+    while time.time() - start < timeout:
+        attempts += 1
+        try:
+            # Use GET (HEAD sometimes returns 405 depending on hosting settings)
+            resp = requests.get(space_url, timeout=10)
+            code = resp.status_code
+            lower_text = resp.text.lower() if resp.text else ''
+            if code == 200:
+                if any(marker in lower_text for marker in sleeping_markers):
+                    print(f"⏳ Space cold-start in progress (attempt {attempts}, HTTP 200 sleeping page). Waiting {interval}s...")
+                else:
+                    print(f"✅ Space awake after {round(time.time()-start,2)}s (attempt {attempts})")
+                    return True
+            elif code in (503, 502, 504):
+                print(f"⏳ Space not ready (HTTP {code}) attempt {attempts}; sleeping...")
+            else:
+                # Unexpected status; may still be waking, keep polling
+                print(f"⚠️ Received HTTP {code} attempt {attempts}; continuing to poll.")
+        except Exception as e:
+            print(f"⚠️ Poll error attempt {attempts}: {e}")
+        time.sleep(interval)
+    print(f"❌ Space did not wake within {timeout}s.")
+    return False
+
 @app.route('/analyze-sar', methods=['POST'])
 def analyze_sar():
     """
@@ -500,6 +545,18 @@ def analyze_sar():
         if not client:
             return jsonify({'error': 'SAR Space unavailable'}), 503
 
+        # 3b. Ensure Space is awake before first predict to avoid cold-start errors
+        wake_start = time.time()
+        if not wait_for_space_ready(space_url):
+            waited = time.time() - wake_start
+            return jsonify({
+                'error': 'SAR Space cold start timeout',
+                'details': f'Waited {int(waited)}s for Space to wake. Try again shortly.',
+                'space_used': space_url,
+                'space_wake_wait_seconds': int(waited)
+            }), 504
+        wake_wait = time.time() - wake_start
+
         # 4. Call Gradio API with file using handle_file
         # gradio_client.handle_file() creates the proper payload format
         from gradio_client import handle_file
@@ -507,30 +564,55 @@ def analyze_sar():
         api_variants = ["/predict", "predict"]
         result = None
         last_exc = None
-        for api_name in api_variants:
-            try:
-                print(f"🔁 Trying Gradio API with api_name='{api_name}' using handle_file")
-                result = client.predict(handle_file(filepath), confidence, api_name=api_name)
-                print(f"✅ Gradio call succeeded with api_name='{api_name}'")
-                break
-            except Exception as e:
-                print(f"❌ api_name='{api_name}' failed: {e}")
-                last_exc = e
-                # if error indicates missing api_name, try next variant
-                if "Cannot find a function with `api_name`" in str(e):
-                    continue
-                # otherwise, break and propagate
-                break
+        # Retry predict within wake window in case Space turns ready during first attempts
+        predict_timeout = int(os.getenv('SPACE_PREDICT_TIMEOUT', os.getenv('SPACE_WAKE_TIMEOUT', '120')))
+        poll_interval = int(os.getenv('SPACE_WAKE_INTERVAL', '5'))
+        predict_start = time.time()
+        attempt = 0
+        while (time.time() - predict_start) < predict_timeout and result is None:
+            attempt += 1
+            for api_name in api_variants:
+                try:
+                    print(f"🔁 [attempt {attempt}] Gradio API api_name='{api_name}' using handle_file")
+                    result = client.predict(handle_file(filepath), confidence, api_name=api_name)
+                    print(f"✅ Gradio call succeeded with api_name='{api_name}' on attempt {attempt}")
+                    break
+                except Exception as e:
+                    msg = str(e)
+                    print(f"❌ api_name='{api_name}' failed on attempt {attempt}: {msg}")
+                    last_exc = e
+                    if "Cannot find a function with `api_name`" in msg:
+                        # try next variant immediately
+                        continue
+                    # Errors likely due to cold start or gateway -> wait and retry
+                    if any(k in msg for k in [
+                        '503', '502', '504', 'Service Unavailable', 'Bad Gateway', 'Failed to fetch', 'Connection aborted'
+                    ]):
+                        print(f"⏳ Likely cold-start/network transient. Waiting {poll_interval}s before retry...")
+                        time.sleep(poll_interval)
+                        # break the for-loop to restart api variants next while iteration
+                        break
+                    # Non-retryable error -> break out fully
+                    break
 
-        # fallback: try without specifying api_name
-        if result is None:
-            try:
-                print("🔁 Trying Gradio API without api_name (fallback)")
-                result = client.predict(handle_file(filepath), confidence)
-                print("✅ Gradio call succeeded without api_name")
-            except Exception as e:
-                print(f"❌ Fallback call failed: {e}")
-                last_exc = e
+            # If still no result, try without api_name as an additional variant
+            if result is None:
+                try:
+                    print(f"🔁 [attempt {attempt}] Gradio API without api_name (fallback)")
+                    result = client.predict(handle_file(filepath), confidence)
+                    print(f"✅ Gradio call succeeded without api_name on attempt {attempt}")
+                except Exception as e:
+                    msg = str(e)
+                    print(f"❌ Fallback (no api_name) failed on attempt {attempt}: {msg}")
+                    last_exc = e
+                    if any(k in msg for k in [
+                        '503', '502', '504', 'Service Unavailable', 'Bad Gateway', 'Failed to fetch', 'Connection aborted'
+                    ]):
+                        print(f"⏳ Waiting {poll_interval}s then retrying predict...")
+                        time.sleep(poll_interval)
+                        continue
+                    # otherwise, break out as non-retryable
+                    break
 
         if result is None:
             # Provide the last exception message to the caller for debugging
@@ -611,7 +693,8 @@ def analyze_sar():
             'uploaded_image_url': url_for('serve_uploaded_image', filename=filename),
             'original_filename': filename,
             'processed_at': datetime.now().isoformat(),
-            'space_used': space_url or 'unknown'
+            'space_used': space_url or 'unknown',
+            'space_wake_wait_seconds': int(wake_wait)
         })
     except Exception as e:
         return jsonify({'error': f"SAR Space processing failed: {str(e)}"}), 500
