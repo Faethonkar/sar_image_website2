@@ -9,8 +9,8 @@
       gtag('js', new Date());
       gtag('config', 'G-XXXXXXXXXX');
     </script>
-    <meta name="description" content="Έργα SAR - Παραδείγματα δορυφορικής απεικόνισης DBF">
-    <meta name="keywords" content="SAR projects, έργα SAR, satellite imagery, δορυφορικές εικόνες">
+    <meta name="description" content="Έργα DBF Science Technology – Αμυντική τεχνολογία, δορυφορική απεικόνιση και εφαρμοσμένη έρευνα. DBF Science Technology projects in defense technology, satellite imagery and applied research.">
+    <meta name="keywords" content="έργα άμυνας, defense projects, δορυφορική απεικόνιση, satellite imagery, εφαρμοσμένη έρευνα, applied research, DBF Science Technology, αμυντική τεχνολογία">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -21,7 +21,16 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAR Imaging Team - Projects</title>
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.dbfsciencetechnology.gr/projects">
+    <meta property="og:title" content="Έργα | DBF Science Technology">
+    <meta property="og:description" content="Έργα αμυντικής τεχνολογίας, δορυφορικής απεικόνισης και εφαρμοσμένης έρευνας. Defense technology, satellite imagery and applied research projects.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.dbfsciencetechnology.gr/projects">
+    <meta property="og:site_name" content="DBF Science Technology">
+    <meta property="og:locale" content="el_GR">
+    <meta property="og:locale:alternate" content="en_US">
+    <title>Έργα | DBF Science Technology</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/banner.css">
     <style>
@@ -68,6 +77,10 @@
         <!-- SAR test banner (shared, top-left) -->
         
     <header>
+        <div class="language-toggle">
+            <button class="lang-btn active" id="btn-el">ΕΛ</button>
+            <button class="lang-btn" id="btn-en">EN</button>
+        </div>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
             <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
@@ -341,6 +354,10 @@
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
         initializeCarousel();
+        const btnEl = document.getElementById('btn-el');
+        const btnEn = document.getElementById('btn-en');
+        if (btnEl) btnEl.addEventListener('click', () => switchLanguage('el'));
+        if (btnEn) btnEn.addEventListener('click', () => switchLanguage('en'));
     });
     </script>
     <script src="/static/banner.js"></script>

@@ -1,32 +1,74 @@
-# SAR Image Analysis Website
+# DBF Science Technology Website
 
-🛰️ **Synthetic Aperture Radar (SAR) Image Analysis System**
-
-A web application for automated detection of ships and aircraft in SAR satellite imagery using YOLO deep learning models.
-
-## 🌟 Features
-
-- **Upload SAR Images**: Support for PNG, JPG, JPEG formats
-- **AI Detection**: Automatic detection of ships and aircraft using YOLO models
-- **Dual Processing**: Hugging Face Space + Local Gradio fallback
-- **Real-time Results**: Side-by-side display of original and annotated images
-- **Detection Summary**: Visual counts and detailed detection information
-- **Responsive Design**: Works on desktop and mobile devices
-- **Multi-language Support**: Greek and English interface
-
-## 🚀 Live Demo
-
-- **Website**: [Your Railway URL will be here]
-- **Hugging Face Space**: [https://huggingface.co/spaces/Faethon88/sar_imaging](https://huggingface.co/spaces/Faethon88/sar_imaging)
+A multi-page website for DBF Science Technology with Greek/English language support.
 
 ## 🛠️ Technology Stack
 
 - **Backend**: Flask (Python)
-- **AI Model**: YOLO v8 for object detection
-- **Model Hub**: Hugging Face
-- **UI Framework**: Gradio
 - **Deployment**: Railway
-- **Model Storage**: Hugging Face Hub
+- **UI**: Vanilla HTML/CSS/JS with multi-language support
+
+## 📁 Project Structure
+
+```
+dbf_site/
+├── src/
+│   ├── main.py                   # Flask server
+│   └── static/                   # HTML, CSS, JS, images
+├── requirements.txt              # Python dependencies
+├── Procfile                      # Railway deployment configuration
+└── README.md                     # This file
+```
+
+## 🔧 Local Development
+
+### Prerequisites
+- Python 3.8+
+
+### Setup
+
+1. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+2. **Run the development server:**
+```bash
+cd src
+python main.py
+```
+
+3. **Access the application:**
+- Website: http://127.0.0.1:5000
+
+## 🌐 Railway Deployment
+
+```bash
+git add .
+git commit -m "Deploy"
+git push origin main
+```
+
+Then connect the repo in [Railway.app](https://railway.app). The `Procfile` handles startup automatically.
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `PORT` | Server port (set by Railway) | Auto |
+| `SECRET_KEY` | Flask secret key | Optional |
+| `ADMIN_USERNAME` | Admin panel username | Optional |
+| `ADMIN_PASSWORD` | Admin panel password | Optional |
+
+## 🔐 Admin Panel
+
+- URL: `/admin`
+- Default credentials set via `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars
+
+## 📞 Contact
+
+- **Website**: [DBF Science Technology](https://www.dbfsciencetechnology.gr)
+
 
 ## 📁 Project Structure
 

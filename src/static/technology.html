@@ -9,8 +9,8 @@
       gtag('js', new Date());
       gtag('config', 'G-XXXXXXXXXX');
     </script>
-    <meta name="description" content="Τεχνολογία SAR - Synthetic Aperture Radar - DBF Science Technology">
-    <meta name="keywords" content="SAR, Synthetic Aperture Radar, δορυφορική, ICEYE, ESA, radar">
+    <meta name="description" content="Τεχνολογία Δορυφορικής Απεικόνισης – SAR, Synthetic Aperture Radar, αμυντική τεχνολογία και εφαρμοσμένη έρευνα. DBF Science Technology. SAR imaging technology, defense research and satellite intelligence.">
+    <meta name="keywords" content="SAR, Synthetic Aperture Radar, δορυφορική απεικόνιση, satellite imagery, αμυντική τεχνολογία, defense technology, εφαρμοσμένη έρευνα, applied research, ICEYE, ESA, radar, DBF">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -21,14 +21,27 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAR Imaging Team - Technology</title>
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.dbfsciencetechnology.gr/technology">
+    <meta property="og:title" content="Τεχνολογία | DBF Science Technology">
+    <meta property="og:description" content="Τεχνολογία δορυφορικής απεικόνισης SAR, αμυντική τεχνολογία και εφαρμοσμένη έρευνα. SAR satellite imaging technology and defense research.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.dbfsciencetechnology.gr/technology">
+    <meta property="og:site_name" content="DBF Science Technology">
+    <meta property="og:locale" content="el_GR">
+    <meta property="og:locale:alternate" content="en_US">
+    <title>Τεχνολογία | DBF Science Technology</title>
     <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="/static/banner.css">
+    <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
         <!-- SAR test banner (shared, top-left) -->
         
     <header>
+        <div class="language-toggle">
+            <button class="lang-btn active" id="btn-el">ΕΛ</button>
+            <button class="lang-btn" id="btn-en">EN</button>
+        </div>
         <h1 style="font-size: 2.5em;">DBF Science Technology</h1>
         <div class="lang-content active" id="header-el">
             <p style="font-size: 1.25em;">Επιστήμη. Στρατηγική. Υπεροχή.</p>
@@ -132,79 +145,8 @@
             </div>
         </div>
 
-        <!-- SAR Image Analysis Section -->
-        <!-- SAR Image Analysis Section Removed -->
-        <!-- SAR Image Analysis / Detection Section (embedded) -->
-        <section style="margin-top: 28px;">
-            <div style="text-align:center;">
-                <h2 id="test-sar-section" style="font-size: 2em; color: #005580;">
-                            <span class="lang-content" id="sar-title-el">Δοκιμή Μοντέλου SAR</span>
-                            <span class="lang-content" id="sar-title-en">Test SAR Model</span>
-                        </h2>
-                <p style="color:#555; max-width:900px; margin: 6px auto 18px auto;">
-                    <span class="lang-content" id="sar-desc-el">Μπορείτε να ανεβάσετε μια εικόνα SAR για ανίχνευση πλοίων και αεροσκαφών. Η ανάλυση θα εκτελεστεί μέσω του SAR AI service.</span>
-                </p>
-
-                <!-- Single form shared across languages; language-specific labels inside -->
-                <form id="sar-form" style="display:inline-block; text-align:left; background:#fff; padding:18px; border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,0.06); max-width:920px; width:100%;">
-                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center;">
-                        <label for="sar-file" style="cursor:pointer;">
-                            <div style="padding:10px 14px; border-radius:8px; border:1px dashed #cfd8dc; background:#fafafa; color:#37474f; min-width:220px; text-align:center;">
-                                <span class="lang-content" id="sar-btn-el">Επιλέξτε εικόνα (PNG/JPG)</span>
-                                <span class="lang-content" id="sar-btn-en">Select image (PNG/JPG)</span>
-                            </div>
-                        </label>
-                        <input id="sar-file" name="file" type="file" accept="image/png,image/jpeg" style="display:none;">
-
-                        <div style="min-width:220px; text-align:center;">
-                            <button id="sar-submit" type="submit" style="background:#1976d2; color:#fff; padding:10px 18px; border-radius:6px; border:none; cursor:pointer; font-weight:600;">
-                                <span class="lang-content" id="sar-submit-el">Ανάλυση Εικόνας SAR</span>
-                                <span class="lang-content" id="sar-submit-en">Analyze SAR Image</span>
-                            </button>
-                        </div>
-                        <div style="min-width:320px; text-align:center;">
-                            <label style="display:block; font-weight:600; margin-bottom:6px; color: #1976d2;"> 
-                                <span class="lang-content" id="conf-label-el">Κατώφλι Εμπιστοσύνης</span>
-                                <span class="lang-content" id="conf-label-en">Confidence Threshold</span>
-                            </label>
-                            <input id="sar-confidence" name="confidence" type="range" min="0.1" max="1.0" step="0.05" value="0.5" style="width:70%;">
-                            <div style="margin-top:6px; font-weight:600; color: #1976d2;">
-                                <span id="sar-confidence-value">50%</span>
-                            </div>
-                        </div>
-                        <!-- Link to external Space removed for security / UX at user's request -->
-                    </div>
-
-                    <div id="sar-status" style="display:none; margin-top:14px; padding:12px; border-radius:6px;">
-                        <div id="sar-status-text" style="font-weight:600;">Preparing...</div>
-                    </div>
-
-                    <div id="sar-results" style="display:none; margin-top:14px;">
-                        <div id="sar-original-image" style="text-align:center; margin-bottom:12px;"></div>
-                        <div id="sar-processed-image" style="text-align:center; margin-bottom:12px;"></div>
-                        <div id="sar-detection-details" style="margin-top:6px;"></div>
-                        <div id="sar-metadata" style="margin-top:8px; color:#666; font-size:0.95em;"></div>
-                    </div>
-                </form>
-            </div>
-        </section>
         
-        <!-- SAR Images Test Dataset Section -->
-        <section id="sar-images-test" style="margin-top:28px; color:#1976d2;">
-            <div style="max-width:920px; margin:0 auto; background:#fff; padding:18px; border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,0.06); text-align:left;">
-                <p style="color:#090b74; margin:0; font-weight:900;">SAR_images_test — Sample images for object detection</p>
-                <p style="color:#555; text-align:left;">This collection contains representative SAR images you can use to test the object-detection pipeline (ships, small craft, large vessels, aircraft where visible). Images are provided as examples — for production use please supply your own SAR imagery with appropriate licensing.</p>
-                <p style="color:#555; text-align:left;"><strong>Best suited images:</strong> medium-to-high resolution SAR scenes (1–10 m), minimal compression artifacts, with ships visible as bright point-like returns or elongated streaks. Avoid extreme speckle or very low resolution.</p>
 
-                <p style="margin-top:14px; color:#444; font-size:0.95em; text-align:left;">
-                    Download <a href="/images/SAR_images_test.rar" download="SAR_images_test.rar" style="color:inherit; text-decoration:underline;"><strong>SAR_images_test.rar</strong></a> and then upload it using the <em>Test SAR Model</em> form above to run detection against the sample dataset.
-                </p>
-
-                <div style="text-align:left; margin-top:12px;">
-                    <span style="margin-left:0; color:#666; font-size:0.95em;">(ZIP/RAR will download directly; ensure your browser allows .rar files)</span>
-                </div>
-            </div>
-        </section>
     </main>
     
     <!-- Footer with Language Support -->
@@ -241,247 +183,15 @@
         localStorage.setItem('preferredLanguage', lang);
     }
 
-    // Load saved language preference on page load and kick off Space warmup
+    // Load saved language preference on page load
     document.addEventListener('DOMContentLoaded', function() {
         const savedLang = localStorage.getItem('preferredLanguage') || 'el';
         switchLanguage(savedLang);
-
-        // Proactively warm up the backend Space so first analysis doesn't fail on cold start
-        const submitBtn = document.getElementById('sar-submit');
-        const statusDiv = document.getElementById('sar-status');
-        const statusText = document.getElementById('sar-status-text');
-        if (submitBtn && statusDiv && statusText) {
-            // Disable while warming
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Waking service…';
-
-            statusDiv.style.display = 'block';
-            statusDiv.style.backgroundColor = '#fff3cd';
-            statusDiv.style.color = '#856404';
-            statusText.textContent = 'Waking AI service… this can take up to ~2 minutes after inactivity.';
-
-            // Polling strategy: shorter server-side waits, loop client-side until ready or max time
-            const maxTotalMs = 120000; // 120s cap
-            const perCallTimeout = 20000; // 20s per warmup request on server
-            const perCallInterval = 4; // server poll interval seconds
-            const betweenCallsMs = 3000; // wait between requests
-            const startTs = Date.now();
-
-            async function warmupOnce() {
-                try {
-                    const url = `/warmup-space?timeout=${Math.floor(perCallTimeout/1000)}&interval=${perCallInterval}`;
-                    const resp = await fetch(url, { method: 'GET' });
-                    const data = await resp.json().catch(() => ({}));
-                    const elapsed = Math.round((Date.now() - startTs) / 1000);
-                    if (resp.ok && data && (data.success === true || data.woke === true)) {
-                        statusDiv.style.backgroundColor = '#e8f5e8';
-                        statusDiv.style.color = '#2e7d32';
-                        statusText.textContent = 'AI service is ready.';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Analyze SAR Image';
-                        return true;
-                    } else {
-                        statusDiv.style.backgroundColor = '#fff3cd';
-                        statusDiv.style.color = '#856404';
-                        const detail = (data && (data.error || (data.api_info && data.api_info.error))) || 'still waking';
-                        statusText.textContent = `Waking AI service… (${elapsed}s) ${detail}`;
-                        return false;
-                    }
-                } catch (e) {
-                    const elapsed = Math.round((Date.now() - startTs) / 1000);
-                    statusDiv.style.backgroundColor = '#fff3cd';
-                    statusDiv.style.color = '#856404';
-                    statusText.textContent = `Waking AI service… (${elapsed}s) network retry`; 
-                    return false;
-                }
-            }
-
-            (async function warmupLoop(){
-                while (Date.now() - startTs < maxTotalMs) {
-                    const ok = await warmupOnce();
-                    if (ok) return;
-                    await new Promise(r => setTimeout(r, betweenCallsMs));
-                }
-                // Timed out warming up
-                statusDiv.style.backgroundColor = '#ffebee';
-                statusDiv.style.color = '#c62828';
-                statusText.textContent = 'AI service did not wake in time. You can still try Analyze; it will retry server-side.';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Analyze SAR Image';
-            })();
-        }
+        const btnEl = document.getElementById('btn-el');
+        const btnEn = document.getElementById('btn-en');
+        if (btnEl) btnEl.addEventListener('click', () => switchLanguage('el'));
+        if (btnEn) btnEn.addEventListener('click', () => switchLanguage('en'));
     });
-
-    // Update confidence display
-    const confSlider = document.getElementById('sar-confidence');
-    const confDisplay = document.getElementById('sar-confidence-value');
-    if (confSlider && confDisplay) {
-        confDisplay.textContent = Math.round(parseFloat(confSlider.value) * 100) + '%';
-        confSlider.addEventListener('input', function() {
-            confDisplay.textContent = Math.round(parseFloat(confSlider.value) * 100) + '%';
-        });
-    }
-    // SAR Image Analysis Form Handler
-    const sarForm = document.getElementById('sar-form');
-    if (sarForm) {
-        sarForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            
-            const statusDiv = document.getElementById('sar-status');
-            const statusText = document.getElementById('sar-status-text');
-            const resultsDiv = document.getElementById('sar-results');
-            const submitBtn = document.getElementById('sar-submit');
-            
-            // Show status and hide results
-            statusDiv.style.display = 'block';
-            statusDiv.style.backgroundColor = '#e3f2fd';
-            statusDiv.style.color = '#1565c0';
-            statusText.textContent = 'Uploading image and connecting to SAR analysis service...';
-            resultsDiv.style.display = 'none';
-            
-            // Disable submit button
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Analyzing...';
-
-            const fileInput = document.getElementById('sar-file');
-            if (!fileInput.files.length) {
-                statusDiv.style.backgroundColor = '#ffebee';
-                statusDiv.style.color = '#c62828';
-                statusText.textContent = 'Please select an image file.';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Analyze SAR Image';
-                return;
-            }
-
-            // Check file size (10MB limit)
-            const file = fileInput.files[0];
-            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-            if (file.size > maxSize) {
-                statusDiv.style.backgroundColor = '#ffebee';
-                statusDiv.style.color = '#c62828';
-                statusText.textContent = `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Please select a file smaller than 10MB.`;
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Analyze SAR Image';
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-            // Attach confidence value
-            const confInput = document.getElementById('sar-confidence');
-            const confValue = parseFloat(confInput ? confInput.value : 0.5);
-            formData.append('confidence', confValue);
-
-            try {
-                statusText.textContent = 'Processing image through AI detection model...';
-                
-                const response = await fetch('/analyze-sar', { 
-                    method: 'POST', 
-                    body: formData 
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    // Success - show results
-                    statusDiv.style.backgroundColor = '#e8f5e8';
-                    statusDiv.style.color = '#2e7d32';
-                    statusText.textContent = 'Analysis completed successfully!';
-                    
-                    // Show original image
-                    const originalImageDiv = document.getElementById('sar-original-image');
-                    if (data.uploaded_image_url) {
-                        originalImageDiv.innerHTML = `
-                            <img src="${data.uploaded_image_url}" alt="Original SAR Image" 
-                                 style="max-width: 100%; max-height: 400px; border: 2px solid #005580; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        `;
-                    }
-                    
-                    // Show processed image
-                    const processedImageDiv = document.getElementById('sar-processed-image');
-                    if (data.annotated_image_url) {
-                        processedImageDiv.innerHTML = `
-                            <img src="${data.annotated_image_url}" alt="SAR Detection Results" 
-                                 style="max-width: 100%; max-height: 400px; border: 2px solid #28a745; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            ${data.download_url ? `
-                            <div style="margin-top: 15px;">
-                                <a href="${data.download_url}" 
-                                   download="sar_analysis_result.jpg"
-                                   style="display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                                    💾 Download Result
-                                </a>
-                            </div>` : ''}
-                        `;
-                    } else {
-                        processedImageDiv.innerHTML = '<p style="color: #666;">Processed image not available.</p>';
-                    }
-                    
-                    // Parse and display detection summary
-                    const detectionDetails = document.getElementById('sar-detection-details');
-                    const summary = data.detection_summary || 'No detection information available.';
-                    
-                    // Try to parse detection counts from summary
-                    // Handle both formats: "ships: 3" and "3 ships"
-                    const shipMatches = summary.match(/(?:ships?:\s*(\d+)|(\d+)\s*ships?)/i);
-                    const aircraftMatches = summary.match(/(?:aircrafts?:\s*(\d+)|(\d+)\s*aircrafts?)/i);
-                    
-                    const shipCount = shipMatches ? parseInt(shipMatches[1] || shipMatches[2]) : 0;
-                    const aircraftCount = aircraftMatches ? parseInt(aircraftMatches[1] || aircraftMatches[2]) : 0;
-                    
-                    let detectionHTML = `
-                        <div style="display: flex; justify-content: space-around; margin: 15px 0;">
-                            <div style="text-align: center; padding: 15px; background: #e3f2fd; border-radius: 8px; min-width: 120px;">
-                                <div style="font-size: 2em; font-weight: bold; color: #1565c0;">${shipCount}</div>
-                                <div style="color: #1565c0; font-weight: 500;">Ships Detected</div>
-                            </div>
-                            <div style="text-align: center; padding: 15px; background: #f3e5f5; border-radius: 8px; min-width: 120px;">
-                                <div style="font-size: 2em; font-weight: bold; color: #7b1fa2;">${aircraftCount}</div>
-                                <div style="color: #7b1fa2; font-weight: 500;">Aircrafts Detected</div>
-                            </div>
-                        </div>
-                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 10px;">
-                            <strong>Raw Detection Output:</strong><br>
-                            <span style="font-family: monospace; font-size: 0.9em; color: #495057;">${summary}</span>
-                        </div>
-                    `;
-                    
-                    detectionDetails.innerHTML = detectionHTML;
-                    
-                    // Show metadata
-                    const metadataDiv = document.getElementById('sar-metadata');
-                    const spaceUsed = data.space_used || 'Unknown';
-                    const serviceName = spaceUsed.includes('huggingface') ? 'Hugging Face Space' : 'Local Server';
-                    metadataDiv.innerHTML = `
-                        <strong>File:</strong> ${data.original_filename || 'Unknown'} | 
-                        <strong>Processed:</strong> ${data.processed_at ? new Date(data.processed_at).toLocaleString() : new Date().toLocaleString()} | 
-                        <strong>Service:</strong> ${serviceName} | 
-                        <strong>Confidence:</strong> ${Math.round((data.confidence || confValue) * 100)}%
-                    `;
-                    
-                    resultsDiv.style.display = 'block';
-                    
-                } else {
-                    // Error from server
-                    statusDiv.style.backgroundColor = '#ffebee';
-                    statusDiv.style.color = '#c62828';
-                    statusText.textContent = `Analysis failed: ${data.error}`;
-                    if (data.details) {
-                        statusText.textContent += ` (${data.details})`;
-                    }
-                }
-                
-            } catch (err) {
-                // Network or other error
-                statusDiv.style.backgroundColor = '#ffebee';
-                statusDiv.style.color = '#c62828';
-                statusText.textContent = `Upload failed: ${err.message}`;
-            }
-            
-            // Re-enable submit button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Analyze SAR Image';
-        });
-    }
     </script>
 </body>
 </html>

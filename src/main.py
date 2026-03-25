@@ -1,20 +1,15 @@
 import os
-from gradio_client import Client
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import sys
 import json
 import time
 from datetime import datetime
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 import base64
 from io import BytesIO
 import numpy as np
-import torch
-import torchvision
 import requests
 import certifi
-import shutil
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,21 +18,6 @@ ca_bundle = certifi.where()
 os.environ.setdefault('REQUESTS_CA_BUNDLE', ca_bundle)
 os.environ.setdefault('SSL_CERT_FILE', ca_bundle)
 print(f"Using CA bundle: {ca_bundle}")
-
-# Try to import YOLO
-try:
-    from ultralytics import YOLO
-    YOLO_AVAILABLE = True
-except ImportError:
-    print("Warning: ultralytics not available. YOLO ship detection will be disabled.")
-    YOLO_AVAILABLE = False
-
-# Load environment variables
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    print("python-dotenv not installed. Environment variables will be loaded from system environment only.")
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -271,62 +251,6 @@ def delete_submission_route(submission_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/detect_ships', methods=['POST'])
-def detect_ships():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
-    try:
-        if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            return jsonify({'error': 'Invalid file type'}), 400
-
-        timestamp = int(datetime.now().timestamp())
-        upload_filename = secure_filename(f"{timestamp}_{file.filename}")
-        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], upload_filename)
-        file.save(upload_path)
-
-        img = Image.open(upload_path)
-        
-        if YOLO_AVAILABLE:
-            try:
-                model_path = os.path.join(Path(__file__).parent.parent, "src", "models", "yolo", "best.pt")
-                if os.path.exists(model_path):
-                    model = YOLO(model_path)
-                    results = model(img)
-                    result = results[0]
-                    
-                    num_ships = len([box for box in result.boxes if box.conf >= 0.3])
-                    
-                    processed_img = Image.fromarray(result.plot())
-                else:
-                    num_ships = 0
-                    processed_img = img
-            except Exception as e:
-                print(f"YOLO processing error: {e}")
-                num_ships = 0
-                processed_img = img
-        else:
-            num_ships = 0
-            processed_img = img
-            
-        buffered = BytesIO()
-        processed_img.save(buffered, format="JPEG")
-        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
-        return jsonify({
-            'num_ships': num_ships,
-            'processed_image': f"data:image/jpeg;base64,{img_str}",
-            'uploaded_image': url_for('serve_uploaded_image', filename=upload_filename),
-            'message': 'Ship detection unavailable in deployment mode' if not YOLO_AVAILABLE else ('No ships detected' if num_ships == 0 else None)
-        })
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
 @app.route('/save_image', methods=['POST'])
 def save_image():
     try:
