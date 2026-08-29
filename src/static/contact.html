@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="/static/banner.css">
 </head>
 <body>
-        <!-- SAR test banner (shared, top-left) -->
-        
+    <!-- SAR test banner (shared, top-left) -->
+
     <header>
         <div class="language-toggle">
             <button class="lang-btn active" id="btn-el">ΕΛ</button>
@@ -50,7 +50,7 @@
             <p style="font-size: 1.25em;">Science. Strategy. Superiority.</p>
         </div>
     </header>
-    
+
     <nav>
         <!-- Greek Navigation -->
         <div class="lang-content active" id="nav-el">
@@ -89,65 +89,25 @@
             </ul>
         </div>
     </nav>
-    
+
     <main>
         <!-- Greek Content -->
         <div class="lang-content active" id="main-el">
             <div class="contact-info">
-                <h1 style="text-align: left;">Επικοινωνήστε μαζί μας</h1>
-                <p>Για ερωτήματα, παρακαλώ επικοινωνήστε με την ομάδα μας:</p>
-
-                <div class="contact-form">
-                    <h3>Στείλτε μας ένα μήνυμα</h3>
-                    <form id="contactForm">
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="name-el" style="display: block; font-size: 0.9em;">Όνομα:</label>
-                            <input type="text" id="name-el" name="name" required style="width: 200px; font-size: 0.9em; padding: 5px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="email-el" style="display: block; font-size: 0.9em;">Email:</label>
-                            <input type="email" id="email-el" name="email" required style="width: 200px; font-size: 0.9em; padding: 5px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="message-el" style="display: block; font-size: 0.9em;">Μήνυμα:</label>
-                            <textarea id="message-el" name="message" rows="5" required style="width: 300px; font-size: 0.9em; padding: 5px;"></textarea>
-                        </div>
-                        <button type="submit" style="font-size: 0.9em; padding: 8px 16px;">Αποστολή</button>
-                    </form>
-                    <div id="form-message-el" style="margin-top: 10px; font-weight: bold;"></div>
-                </div>
+                <h1 style="text-align: left;">Επικοινωνία</h1>
+                <p><a href="mailto:info@dbfsciencetechnology.gr">info@dbfsciencetechnology.gr</a></p>
             </div>
         </div>
-        
+
         <!-- English Content -->
         <div class="lang-content" id="main-en">
             <div class="contact-info">
-                <h1 style="text-align: left;">Contact Us</h1>
-                <p>For inquiries, please reach out to our team:</p>
-
-                <div class="contact-form">
-                    <h3>Send us a message</h3>
-                    <form id="contactFormEn">
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="name-en" style="display: block; font-size: 0.9em;">Name:</label>
-                            <input type="text" id="name-en" name="name" required style="width: 200px; font-size: 0.9em; padding: 5px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="email-en" style="display: block; font-size: 0.9em;">Email:</label>
-                            <input type="email" id="email-en" name="email" required style="width: 200px; font-size: 0.9em; padding: 5px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label for="message-en" style="display: block; font-size: 0.9em;">Message:</label>
-                            <textarea id="message-en" name="message" rows="5" required style="width: 300px; font-size: 0.9em; padding: 5px;"></textarea>
-                        </div>
-                        <button type="submit" style="font-size: 0.9em; padding: 8px 16px;">Submit</button>
-                    </form>
-                    <div id="form-message-en" style="margin-top: 10px; font-weight: bold;"></div>
-                </div>
+                <h1 style="text-align: left;">Contact</h1>
+                <p><a href="mailto:info@dbfsciencetechnology.gr">info@dbfsciencetechnology.gr</a></p>
             </div>
         </div>
     </main>
-    
+
     <!-- Footer with Language Support -->
     <footer>
         <div class="lang-content active" id="footer-el">
@@ -187,35 +147,6 @@
         if (btnEl) btnEl.addEventListener('click', () => switchLanguage('el'));
         if (btnEn) btnEn.addEventListener('click', () => switchLanguage('en'));
     });
-
-    // Contact form handling
-    function handleFormSubmit(formId, messageId) {
-        const form = document.getElementById(formId);
-        const messageDiv = document.getElementById(messageId);
-        if (!form) return;
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch('/submit_contact', {
-                method: 'POST',
-                body: formData
-            }).then(resp => {
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                return resp.json();
-            }).then(data => {
-                if (messageDiv) messageDiv.textContent = data.message || 'Message sent.';
-                form.reset();
-            }).catch(err => {
-                if (messageDiv) messageDiv.textContent = 'Error sending message.';
-                console.error(err);
-            });
-        });
-    }
-
-    // Initialize contact forms
-    handleFormSubmit('contactForm','form-message-el');
-    handleFormSubmit('contactFormEn','form-message-en');
     </script>
     <script src="/static/banner.js"></script>
 </body>
